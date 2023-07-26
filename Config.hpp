@@ -12,32 +12,43 @@ class Config
 {
 private:
     std::string config_file;
-    std::string config;
+    std::vector<std::string> configVec;
 public:
     Config(std::string file);
     ~Config();
     int parse_config();
-    int check_brackets();
+    int check_brackets(char *s);
+    void printConfig();
+    int confParse();
 };
 
-int Config::check_brackets(){
-    std::stack<char> br;
+int Config::check_brackets(char *s){
+    std::string config = s;
     int i = 0;
+    int counter = 0;
     while ((i = config.find_first_of("{}", i)) != -1)
     {
         if (config.at(i) == '{'){
-            br.push('{');
+            counter++;
         }else
-            br.pop();
+            counter--;
         i++;
     }
-    if (!br.empty())
+    if (counter)
         return -1;
     return 0;
 }
 
-int Config::parse_config()
-{
+void Config::printConfig(){
+    std::vector<std::string>::iterator it = configVec.begin();
+    while (it != configVec.end())
+    {
+        std::cout << *it << std::endl;
+        it++;
+    }
+}
+
+int Config::confParse(){
     char s[1042];
     int fd;
 
@@ -54,24 +65,24 @@ int Config::parse_config()
         std::cout << "Can't read." << std::endl;
         return -1;
     }
-    config = s;
-    if (check_brackets() < 0)
+    if (check_brackets(s) < 0)
         return -1;
     int i = 0;
-    std::vector<std::string> configVec;
     char *x = strtok(s, " \t\n");
-    configVec.push_back(x);
     while (x){
-        // std::cout <<"->"<< config[i] <<""<< std::endl;
-        // std::cout <<".."<< i << std::endl;
-        std::cout <<"->"<< x << std::endl;
         configVec.push_back(x);
         x = strtok(NULL, " \t\n");
     }
-    std::vector<std::string>::iterator it = configVec.begin();
-    std::cout << "-> " << config << "." << std::endl;
-    // " \t\n"
+
+    return 0;
+}
+
+int Config::parse_config()
+{
+    if (confParse() < 0)
+        return -1;
     
+    printConfig();
     return 0;
 }
 
