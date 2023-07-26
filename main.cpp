@@ -6,6 +6,7 @@
 #include "Request.hpp"
 #include "Response.hpp"
 #include "Config.hpp"
+#include "Server.hpp"
 
 int main(int ac, char **av)
 {

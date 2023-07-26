@@ -1,6 +1,6 @@
 #ifndef CONFIG_HPP
 
-#include <string>
+#include <string.h>
 #include <fstream>
 #include <iostream>
 #include <stack>
@@ -73,7 +73,12 @@ int Config::confParse(){
         configVec.push_back(x);
         x = strtok(NULL, " \t\n");
     }
-
+    int i = 0;
+    while (i < configVec.size())
+    {
+        if (strncmp(configVec[i].c_str(), "server", 6) && (strncmp(configVec[i+1].c_str(), "{", 1) || ))
+    }
+    if (strncmp())
     return 0;
 }
 

@@ -7,3 +7,23 @@ server {
     }
 
 }
+
+/*
+
+server{
+    host
+    port
+    server_name
+    root
+    index
+    error
+    client_body_size
+    methods
+    auto_index
+
+    location /dir{
+        index
+        error_pages
+    }
+}
+*/
