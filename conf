@@ -1,29 +1,27 @@
+
+aze
+
 server {
     listen 8800;
     root /dir;
-    location qwq { {}
+    location qwq {
         qwe
         qwe
     }
-
+    aze
 }
 
-/*
+azeaze
+azeaze
+azeaze
 
 server{
-    host
-    port
-    server_name
-    root
-    index
-    error
-    client_body_size
-    methods
-    auto_index
-
-    location /dir{
-        index
-        error_pages
+    azea5
+    azea
+    location aze{
+        aze aze
+        aze
     }
+    qsd
 }
-*/
+aze

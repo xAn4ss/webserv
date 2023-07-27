@@ -20,6 +20,7 @@ public:
     int check_brackets(char *s);
     void printConfig();
     int confParse();
+    void parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e);
 };
 
 int Config::check_brackets(char *s){
@@ -73,13 +74,53 @@ int Config::confParse(){
         configVec.push_back(x);
         x = strtok(NULL, " \t\n");
     }
-    int i = 0;
+    int b;
+    i = 0;
+    std::vector<std::string>::iterator it = configVec.begin();
     while (i < configVec.size())
     {
-        if (strncmp(configVec[i].c_str(), "server", 6) && (strncmp(configVec[i+1].c_str(), "{", 1) || ))
+        int c = 0;
+        if (!strncmp(configVec[i].c_str(), "server", 6) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{'))
+        {
+            if(configVec[i+1].back() == '{')
+                i++;
+            i++;
+            b = i;
+            while (configVec[i].back() != '}')
+            {
+                if (!strncmp(configVec[i].c_str(), "location", 8) && (!strncmp(configVec[i+2].c_str(), "{", 1) || configVec[i+1].back() == '{'))
+                {
+                    if(!strncmp(configVec[i+2].c_str(), "{", 1))
+                        i++;
+                    i++;
+                    while (!strncmp(configVec[i].c_str(), "}", 1))
+                    {
+                        i++;
+                    }
+                }
+                i++;
+            }
+            i++;
+            c = i;
+            std::vector<std::string>::iterator bgin = it +b;
+            std::vector<std::string>::iterator end = it +c +1;
+            std::cout << "==> " << *end << std::endl;
+            parse_server(bgin, end);
+        }
+        i++;
     }
-    if (strncmp())
     return 0;
+}
+
+void Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
+    std::vector<std::string> conf(b, e);
+    std::vector<std::string>::iterator i = conf.begin();
+    while (i != conf.end())
+    {
+        if (!strncmp())
+        std::cout << "*" << *i << std::endl;
+        i++;
+    }
 }
 
 int Config::parse_config()
