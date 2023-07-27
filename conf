@@ -2,13 +2,15 @@
 aze
 
 server {
-    listen 8800;
-    root /dir;
-    location qwq {
-        qwe
-        qwe
-    }
-    aze
+	root /dir;
+	host 0.0.0.0;
+	port 8000 8001 ;
+	server_name test.ma test.co;
+	location qwq {
+		qwe
+		qwe
+	}
+	aze
 }
 
 azeaze
@@ -16,12 +18,12 @@ azeaze
 azeaze
 
 server{
-    azea5
-    azea
-    location aze{
-        aze aze
-        aze
-    }
-    qsd
+	azea5
+	azea
+	location aze{
+		aze aze
+		aze
+	}
+	qsd
 }
 aze

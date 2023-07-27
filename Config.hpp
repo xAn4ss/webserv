@@ -8,11 +8,14 @@
 #include <unistd.h> 
 #include <vector>
 #include <iterator>
+#include "Server.hpp"
+
 class Config
 {
 private:
     std::string config_file;
     std::vector<std::string> configVec;
+    std::vector<Server> servers;
 public:
     Config(std::string file);
     ~Config();
@@ -69,13 +72,14 @@ int Config::confParse(){
     if (check_brackets(s) < 0)
         return -1;
     int i = 0;
-    char *x = strtok(s, " \t\n");
+    char *x = strtok(s, "\t\n");
     while (x){
         configVec.push_back(x);
-        x = strtok(NULL, " \t\n");
+        x = strtok(NULL, "\t\n");
     }
     int b;
     i = 0;
+    printConfig();
     std::vector<std::string>::iterator it = configVec.begin();
     while (i < configVec.size())
     {
@@ -114,13 +118,49 @@ int Config::confParse(){
 
 void Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
     std::vector<std::string> conf(b, e);
+    Server serv;
     std::vector<std::string>::iterator i = conf.begin();
     while (i != conf.end())
     {
-        if (!strncmp())
-        std::cout << "*" << *i << std::endl;
+        if (!strncmp("host", (*i).c_str(), 4) && ((*(i +1)).back() == ';' || (*(i + 2)).size() == 1))
+        {
+            i++;
+            if ((*i).back() == ';' || (*(i + 1)).size() == 1){
+                serv.setHost((*i).c_str());
+            }
+        }
+        else if (!strncmp("port", (*i).c_str(), 4))
+        {
+            i++;
+            while ((*i).back() != ';')
+            {
+                if((*i).find_first_not_of("0123456789") != -1)
+                {
+                    std::cout << "apaaah" << std::endl;
+                    exit(0);
+                }
+                serv.setPort(atoi((*i).c_str()));
+                i++;
+            }
+            // (*i).
+            if ((*i).size() != 1)
+            {
+                (*i).erase((*i).end()-1);
+                if((*i).find_first_not_of("0123456789") != -1)
+                {
+
+                    std::cout << "aph "<< *i << std::endl;
+                    exit(0);
+                }
+                serv.setPort(atoi((*i).c_str()));
+            }
+
+        }
+
         i++;
     }
+    serv.printPorts();
+    std::cout << "v "<< serv.gethost() << std::endl;
 }
 
 int Config::parse_config()
@@ -128,7 +168,7 @@ int Config::parse_config()
     if (confParse() < 0)
         return -1;
     
-    printConfig();
+    // printConfig();
     return 0;
 }
 
