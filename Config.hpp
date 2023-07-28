@@ -23,7 +23,7 @@ public:
     int check_brackets(char *s);
     void printConfig();
     int confParse();
-    void parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e);
+    int parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e);
 };
 
 int Config::check_brackets(char *s){
@@ -72,14 +72,13 @@ int Config::confParse(){
     if (check_brackets(s) < 0)
         return -1;
     int i = 0;
-    char *x = strtok(s, "\t\n");
+    char *x = strtok(s, "\t\n;");
     while (x){
         configVec.push_back(x);
-        x = strtok(NULL, "\t\n");
+        x = strtok(NULL, "\t\n;");
     }
     int b;
     i = 0;
-    printConfig();
     std::vector<std::string>::iterator it = configVec.begin();
     while (i < configVec.size())
     {
@@ -108,59 +107,55 @@ int Config::confParse(){
             c = i;
             std::vector<std::string>::iterator bgin = it +b;
             std::vector<std::string>::iterator end = it +c +1;
-            std::cout << "==> " << *end << std::endl;
-            parse_server(bgin, end);
+            if (parse_server(bgin, end))
+                return -1;
         }
         i++;
     }
     return 0;
 }
 
-void Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
+std::string* splitIt(std::string s, int & size){
+    int start = 0;
+    int end = 0;
+    std::vector<std::string> tmp;
+    while (end != -1)
+    {
+        end = s.find_first_of(" \t", start);
+        if (!s.substr(start, end - start).empty())
+            tmp.push_back(s.substr(start, end - start));
+        start = end + 1;
+    }
+    int x = -1;
+    size = tmp.size();
+    std::string *line = new std::string[size];
+    while (++x < size)
+        line[x] = tmp[x];
+    return (line);
+}
+
+int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
     std::vector<std::string> conf(b, e);
     Server serv;
     std::vector<std::string>::iterator i = conf.begin();
+    int s;
     while (i != conf.end())
     {
-        if (!strncmp("host", (*i).c_str(), 4) && ((*(i +1)).back() == ';' || (*(i + 2)).size() == 1))
+        s = 0;
+        if (!strncmp("host", (*i).c_str(), 4))
         {
-            i++;
-            if ((*i).back() == ';' || (*(i + 1)).size() == 1){
-                serv.setHost((*i).c_str());
-            }
+            if (serv.setHost(splitIt(*i, s), s))
+                return 1;
         }
         else if (!strncmp("port", (*i).c_str(), 4))
         {
-            i++;
-            while ((*i).back() != ';')
-            {
-                if((*i).find_first_not_of("0123456789") != -1)
-                {
-                    std::cout << "apaaah" << std::endl;
-                    exit(0);
-                }
-                serv.setPort(atoi((*i).c_str()));
-                i++;
-            }
-            // (*i).
-            if ((*i).size() != 1)
-            {
-                (*i).erase((*i).end()-1);
-                if((*i).find_first_not_of("0123456789") != -1)
-                {
-
-                    std::cout << "aph "<< *i << std::endl;
-                    exit(0);
-                }
-                serv.setPort(atoi((*i).c_str()));
-            }
+            
 
         }
 
         i++;
     }
-    serv.printPorts();
-    std::cout << "v "<< serv.gethost() << std::endl;
+    return 0;
 }
 
 int Config::parse_config()
@@ -168,7 +163,7 @@ int Config::parse_config()
     if (confParse() < 0)
         return -1;
     
-    // printConfig();
+    printConfig();
     return 0;
 }
 

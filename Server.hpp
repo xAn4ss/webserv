@@ -18,7 +18,7 @@ private:
 public:
     Server(/* args */);
     ~Server();
-    void setHost(std::string host);
+    int setHost(std::string *host, int &size);
     void setPort(int port);
     void setServerName(std::string server_name);
     void setRoot(std::string root);
@@ -31,8 +31,14 @@ Server::Server(/* args */)
 {
 }
 
-void Server::setHost(std::string host){
-    this->_host = host;
+int Server::setHost(std::string* host, int &size){
+    if (size > 2 || size == 1)
+    {
+        std::cout << "Something is wrong with host directive." << std::endl;
+        return 1;
+    }
+    this->_host = host[1];
+    return 0;
 }
 
 void Server::setPort(int port){
@@ -42,6 +48,7 @@ void Server::setPort(int port){
         std::cout << "port " << port << " already used" << std::endl;
         exit(0);
     }
+    
     _port.push_back(port);
 }
 
