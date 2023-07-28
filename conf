@@ -3,7 +3,7 @@ aze
 
 server {
 	host 0.0.0.0 ;
-	port 8000 8001 ;
+	port 15 21 5 21;
 	root /dir;
 	server_name test.ma test.co;
 	location qwq {

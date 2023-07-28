@@ -19,9 +19,9 @@ public:
     Server(/* args */);
     ~Server();
     int setHost(std::string *host, int &size);
-    void setPort(int port);
+    int setPort(std::string *s, int& size);
     void setServerName(std::string server_name);
-    void setRoot(std::string root);
+    int setRoot(std::string *root, int& size);
 
     void printPorts();
     std::string gethost();
@@ -41,15 +41,38 @@ int Server::setHost(std::string* host, int &size){
     return 0;
 }
 
-void Server::setPort(int port){
-    
-    if (std::find(_port.begin(), _port.end(), port) != _port.end())
+int Server::setPort(std::string *s, int& size){
+    if (size == 1)
     {
-        std::cout << "port " << port << " already used" << std::endl;
-        exit(0);
+        std::cout << "error in port directive." << std::endl;
+        return 1;
+    }
+    for (int i = 1; i < size; i++)
+    {
+        if (s[i].find_first_not_of("1234567890") != -1)
+        {
+            std::cout << "error in ports." << std::endl;
+            return 1; 
+        }
+        if (std::find(_port.begin(), _port.end(), atoi(s[i].c_str())) != _port.end())
+        {
+            std::cout << "port " << s[i] << " already used" << std::endl;
+            return 1;
+        }else
+            _port.push_back(atoi(s[i].c_str()));
+
+    }
+    return 0;
+}
+int Server::setRoot(std::string *s, int& size)
+{
+    if (size == 1)
+    {
+        std::cout << "root missing." << std::endl;
+        return 1;
     }
     
-    _port.push_back(port);
+    return 0;
 }
 
 void Server::printPorts(){

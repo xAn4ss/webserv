@@ -149,10 +149,13 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         }
         else if (!strncmp("port", (*i).c_str(), 4))
         {
-            
-
+            if (serv.setPort(splitIt(*i, s), s))
+                return 1;
         }
-
+        else if (!strncmp("root", (*i).c_str(), 4))
+        {
+            
+        }
         i++;
     }
     return 0;
