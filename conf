@@ -3,9 +3,10 @@ aze
 
 server {
 	host 0.0.0.0 ;
-	port 15 21 5 21;
-	root /dir;
+	port 15 21 5;
+	root test/ ;
 	server_name test.ma test.co;
+	error_page 404 402 error;
 	location qwq {
 		qwe
 		qwe

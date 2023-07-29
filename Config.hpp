@@ -154,7 +154,18 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         }
         else if (!strncmp("root", (*i).c_str(), 4))
         {
-            
+            if (serv.setRoot(splitIt(*i, s), s))
+                return 1;
+        }
+        else if (!strncmp("server_name", (*i).c_str(), 11))
+        {
+            if (serv.setServerName(splitIt(*i, s),s))
+                return 1;
+        }
+        else if (!strncmp("error_page", (*i).c_str(), 10))
+        {
+            if (serv.setError(splitIt(*i, s), s))
+                return 1;
         }
         i++;
     }
