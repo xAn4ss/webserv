@@ -8,11 +8,49 @@
 #include <algorithm>
 #include <dirent.h>
 
+
+class ServLocation
+{
+private:
+    std::string                 _locationPath;
+    std::vector<int>            _error_code;
+    std::string                 _error_path;
+    std::string                 _index;
+    std::string                 _root;
+    bool                        _isAutoIndex;
+    std::string                 _return;
+    std::string                 _client_max_body_size;
+public:
+    ServLocation(/* args */);
+    ~ServLocation();
+    int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
+    // int parse
+};
+
+
+int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::vector<std::string>::iterator end){
+    std::vector<std::string> lct(begin, end);
+    std::cout << "-* "<<(*begin).substr((*begin).find_first_of(" \t")+1, ((*begin).size() + 1 - (*begin).find_last_not_of("{ \t"))) << std::endl;
+    while (begin != end)
+    {
+        
+        std::cout << *begin << std::endl;
+        begin++;
+    }
+
+
+
+    return 0;
+}
+
 class Server
 {
 private:
+    std::vector<ServLocation>  _location;
+    bool                        _isAutoIndex;
     std::string                 _host;
     std::string                 _root;
+    std::string                 _index;
     std::vector<int>            _port;
     std::vector<int>            _error_code;
     std::string                 _error_path;
@@ -28,13 +66,25 @@ public:
     int setRoot(std::string *root, int& size);
     int setServerName(std::string *s, int& size);
     int setError(std::string *s, int& size);
-
+    int setIndex(std::string *s, int& size);
+    int setAutoIndex(std::string *s, int& size);
     void printPorts();
     std::string gethost();
 };
 
+ServLocation::ServLocation(/* args */)
+{
+}
+
+ServLocation::~ServLocation()
+{
+}
+
+
+
 Server::Server(/* args */)
 {
+    _isAutoIndex = false;
 }
 
 int Server::setError(std::string *s, int& size){
@@ -102,6 +152,22 @@ int Server::setPort(std::string *s, int& size){
     return 0;
 }
 
+int Server::setIndex(std::string *s, int& size){
+    if (size != 2)
+    {
+        std::cout << "missing index page" << std::endl;
+        return 1;
+    }
+    std::string path = _root + s[1];
+    if (access(path.c_str(), F_OK) == -1)
+    {
+        std::cout << "wrong server index path"<< std::endl;
+        return 1;
+    }
+    _index = s[1];
+    return 0;
+}
+
 int Server::setServerName(std::string *s, int& size){
     if (size < 2)
     {
@@ -126,6 +192,18 @@ int Server::setRoot(std::string *s, int& size)
         std::cout << "error in root path." << std::endl;
         return 1;
     }
+    _root = s[1];
+    return 0;
+}
+
+int Server::setAutoIndex(std::string *s, int& size){
+    if (size != 2)
+    {
+        std::cout << "error in auto index directive." << std::endl;
+        return 1;
+    }
+    if (!strncmp("on", s[1].c_str(), 2))
+        _isAutoIndex = true;
     return 0;
 }
 

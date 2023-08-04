@@ -154,7 +154,13 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         }
         else if (!strncmp("root", (*i).c_str(), 4))
         {
+
             if (serv.setRoot(splitIt(*i, s), s))
+                return 1;
+        }
+        else if (!strncmp("index", (*i).c_str(), 5))
+        {
+            if (serv.setIndex(splitIt(*i, s), s))
                 return 1;
         }
         else if (!strncmp("server_name", (*i).c_str(), 11))
@@ -167,17 +173,59 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             if (serv.setError(splitIt(*i, s), s))
                 return 1;
         }
+        else if (!strncmp("autoindex", (*i).c_str(), 9)){
+            if (serv.setAutoIndex(splitIt(*i, s), s))
+            return 1;
+        }
+        else if (!strncmp((*i).c_str(), "location", 8) &&
+         (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*i).back() == '{')))
+        {
+            ServLocation location;
+            std::vector<std::string>::iterator begin = i;
+            if (!strncmp((*(i + 1)).c_str(), "{", 1))
+                i++;
+            while (strncmp((*i).c_str(), "}", 1))
+                i++;
+            i++;
+            location.processLocation(begin, i);
+        }
+        std::cout << "-> " << *i << std::endl;
         i++;
     }
     return 0;
 }
+/*
+host
+port
+root (must not be empty)
+index
+server_name (goes by default to localhost)
+error
+auto index
+return
+client_max_body_size
+location{
+    error
+    index
+    root
+    autoindex
+    return
+    client_max_body_size
+    methods
+    cgi_path
+    cgi_exec
+    upload
+}
+*/
+
+
 
 int Config::parse_config()
 {
     if (confParse() < 0)
         return -1;
     
-    printConfig();
+    // printConfig();
     return 0;
 }
 
