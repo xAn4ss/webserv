@@ -52,6 +52,14 @@ void Config::printConfig(){
     }
 }
 
+void getRidOfTabs(std::vector<std::string> &s){
+    std::string tmp;
+    for (int i = 0; i < s.size(); i++){
+        tmp = s[i].substr(s[i].find_first_not_of("\t "));
+        if (s[i].front() = '\t')
+            s[i].swap(tmp);
+    }
+}
 int Config::confParse(){
     char s[1042];
     int fd;
@@ -72,110 +80,128 @@ int Config::confParse(){
     if (check_brackets(s) < 0)
         return -1;
     int i = 0;
-    char *x = strtok(s, "\t\n;");
+    char *x = strtok(s, "\n;");
     while (x){
         configVec.push_back(x);
-        x = strtok(NULL, "\t\n;");
+        x = strtok(NULL, "\n;");
     }
     int b;
     i = 0;
+    getRidOfTabs(configVec);
     std::vector<std::string>::iterator it = configVec.begin();
     while (i < configVec.size())
     {
         int c = 0;
+        b = 0;
         if (!strncmp(configVec[i].c_str(), "server", 6) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{'))
         {
+            // std::cout << "==> "<< i << std::endl;
             if(configVec[i+1].back() == '{')
                 i++;
             i++;
             b = i;
             while (configVec[i].back() != '}')
             {
-                if (!strncmp(configVec[i].c_str(), "location", 8) && (!strncmp(configVec[i+2].c_str(), "{", 1) || configVec[i+1].back() == '{'))
+                if (!strncmp(configVec[i].c_str(), "location", 8) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{'))
                 {
-                    if(!strncmp(configVec[i+2].c_str(), "{", 1))
+                    if(!strncmp(configVec[i+1].c_str(), "{", 1))
                         i++;
                     i++;
-                    while (!strncmp(configVec[i].c_str(), "}", 1))
+                    while (strncmp(configVec[i].c_str(), "}", 1))
                     {
                         i++;
                     }
+                    
                 }
+                    // std::cout << *(it + i) << " ==> " << i<< std::endl;
                 i++;
             }
-            i++;
             c = i;
-            std::vector<std::string>::iterator bgin = it +b;
-            std::vector<std::string>::iterator end = it +c +1;
-            if (parse_server(bgin, end))
-                return -1;
+            i++;
         }
+        std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
+        std::vector<std::string>::iterator bgin = it +b;
+        std::vector<std::string>::iterator end = it +c;
+        std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
+        if (parse_server(bgin, end))
+            return -1;
         i++;
     }
     return 0;
 }
 
-std::string* splitIt(std::string s, int & size){
-    int start = 0;
-    int end = 0;
-    std::vector<std::string> tmp;
-    while (end != -1)
-    {
-        end = s.find_first_of(" \t", start);
-        if (!s.substr(start, end - start).empty())
-            tmp.push_back(s.substr(start, end - start));
-        start = end + 1;
-    }
-    int x = -1;
-    size = tmp.size();
-    std::string *line = new std::string[size];
-    while (++x < size)
-        line[x] = tmp[x];
-    return (line);
-}
+// std::string* splitIt(std::string s, int & size){
+//     int start = 0;
+//     int end = 0;
+//     std::vector<std::string> tmp;
+//     while (end != -1)
+//     {
+//         end = s.find_first_of(" \t", start);
+//         if (!s.substr(start, end - start).empty())
+//             tmp.push_back(s.substr(start, end - start));
+//         start = end + 1;
+//     }
+//     int x = -1;
+//     size = tmp.size();
+//     std::string *line = new std::string[size];
+//     while (++x < size)
+//         line[x] = tmp[x];
+//     return (line);
+// }
 
 int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
     std::vector<std::string> conf(b, e);
     Server serv;
     std::vector<std::string>::iterator i = conf.begin();
     int s;
+
     while (i != conf.end())
     {
+        std::cout << "-> " << *i << std::endl;
         s = 0;
-        if (!strncmp("host", (*i).c_str(), 4))
+        if (!strncmp((*i).c_str(), "#", 1))
+            i++;
+        else if (!strncmp("host", (*i).c_str(), 4))
         {
             if (serv.setHost(splitIt(*i, s), s))
                 return 1;
+            i++;
         }
         else if (!strncmp("port", (*i).c_str(), 4))
         {
             if (serv.setPort(splitIt(*i, s), s))
                 return 1;
+            i++;
         }
         else if (!strncmp("root", (*i).c_str(), 4))
         {
 
             if (serv.setRoot(splitIt(*i, s), s))
                 return 1;
+            i++;
         }
         else if (!strncmp("index", (*i).c_str(), 5))
         {
             if (serv.setIndex(splitIt(*i, s), s))
                 return 1;
+            i++;
         }
         else if (!strncmp("server_name", (*i).c_str(), 11))
         {
             if (serv.setServerName(splitIt(*i, s),s))
                 return 1;
+            i++;
         }
         else if (!strncmp("error_page", (*i).c_str(), 10))
         {
             if (serv.setError(splitIt(*i, s), s))
                 return 1;
+            i++;
         }
         else if (!strncmp("autoindex", (*i).c_str(), 9)){
             if (serv.setAutoIndex(splitIt(*i, s), s))
             return 1;
+            i++;
         }
         else if (!strncmp((*i).c_str(), "location", 8) &&
          (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*i).back() == '{')))
@@ -186,11 +212,22 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
                 i++;
             while (strncmp((*i).c_str(), "}", 1))
                 i++;
+            if (location.processLocation(begin, i))
+                return 1;
             i++;
-            location.processLocation(begin, i);
+            //push servLocation in location vector
         }
-        std::cout << "-> " << *i << std::endl;
-        i++;
+        else if (strncmp((*i).c_str(), "}", 1))
+        {
+            std::cout << "Wrong directive " << *i << std::endl;
+            return 1;
+        }
+        // i++;
+    }
+    if (b == e)
+    {
+        std::cout << "error in conf" << std::endl;
+        return -1;
     }
     return 0;
 }
