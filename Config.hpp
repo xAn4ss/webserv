@@ -54,10 +54,17 @@ void Config::printConfig(){
 
 void getRidOfTabs(std::vector<std::string> &s){
     std::string tmp;
+    std::vector<std::string>::iterator it = s.begin();
     for (int i = 0; i < s.size(); i++){
-        tmp = s[i].substr(s[i].find_first_not_of("\t "));
-        if (s[i].front() = '\t')
-            s[i].swap(tmp);
+            std::cout << s[i] << " ==== "<< s[i].find_first_not_of("\t ") << std::endl;
+            if (s[i].find_first_not_of("\t ") != -1 )
+            {
+                tmp = s[i].substr(s[i].find_first_not_of("\t "));
+                if (s[i].front() = '\t')
+                    s[i].swap(tmp);
+            }
+            else
+                s.erase(it + i);
     }
 }
 int Config::confParse(){
@@ -87,15 +94,19 @@ int Config::confParse(){
     }
     int b;
     i = 0;
+    
     getRidOfTabs(configVec);
     std::vector<std::string>::iterator it = configVec.begin();
     while (i < configVec.size())
     {
         int c = 0;
         b = 0;
-        if (!strncmp(configVec[i].c_str(), "server", 6) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{'))
+        int hash_f = 0;
+        if ((*(it + i)).front() == '#')
+            hash_f = -1;
+        if (!hash_f && (!strncmp(configVec[i].c_str(), "server", 6) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{') || configVec[i].front() == '#'))
         {
-            // std::cout << "==> "<< i << std::endl;
+            hash_f = 0;    
             if(configVec[i+1].back() == '{')
                 i++;
             i++;
@@ -108,23 +119,21 @@ int Config::confParse(){
                         i++;
                     i++;
                     while (strncmp(configVec[i].c_str(), "}", 1))
-                    {
                         i++;
-                    }
-                    
                 }
-                    // std::cout << *(it + i) << " ==> " << i<< std::endl;
                 i++;
             }
             c = i;
-            i++;
         }
-        std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
-        std::vector<std::string>::iterator bgin = it +b;
-        std::vector<std::string>::iterator end = it +c;
-        std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
-        if (parse_server(bgin, end))
-            return -1;
+        if (!hash_f)
+        {
+            std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
+            std::vector<std::string>::iterator bgin = it +b;
+            std::vector<std::string>::iterator end = it +c;
+            std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
+            if (parse_server(bgin, end))
+                return -1;
+        }
         i++;
     }
     return 0;
@@ -154,10 +163,10 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
     Server serv;
     std::vector<std::string>::iterator i = conf.begin();
     int s;
+    int hashf = 0;
 
     while (i != conf.end())
     {
-        std::cout << "-> " << *i << std::endl;
         s = 0;
         if (!strncmp((*i).c_str(), "#", 1))
             i++;
@@ -216,10 +225,11 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
                 return 1;
             i++;
             //push servLocation in location vector
+            serv.addLocation(location);
         }
         else if (strncmp((*i).c_str(), "}", 1))
         {
-            std::cout << "Wrong directive " << *i << std::endl;
+            std::cout << "Wrong directive " << *i << ".." << std::endl;
             return 1;
         }
         // i++;
@@ -229,6 +239,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         std::cout << "error in conf" << std::endl;
         return -1;
     }
+        this->servers.push_back(serv);
     return 0;
 }
 /*
@@ -262,7 +273,17 @@ int Config::parse_config()
     if (confParse() < 0)
         return -1;
     
-    // printConfig();
+    printConfig();
+    int i = -1;
+
+    while (++i < servers.size())
+    {
+        std::cout << "host is " << this->servers[i].gethost() << std::endl;
+        std::cout << "ports are ";
+        this->servers[i].printPorts();
+        std::cout << "location path: " << this->servers[i].getLocations()[0].getLocationPath() << std::endl;
+        std::cout << std::endl;
+    }
     return 0;
 }
 

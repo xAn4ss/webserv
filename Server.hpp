@@ -26,8 +26,23 @@ public:
     int setLocationRoot(std::string* s, int& size);
     int setLocationIndex(std::string* s, int& size);
     int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
+    std::string getLocationRoot();
+    std::string getLocationPath();
+    std::string getLocationIndex();
     // int parse
 };
+std::string ServLocation::getLocationIndex(){
+    return _index;
+}
+
+std::string ServLocation::getLocationPath(){
+    if (_locationPath.empty())
+        return "empty"; 
+    return _locationPath;
+}
+std::string ServLocation::getLocationRoot(){
+    return _root;
+}
 
 std::string* splitIt(std::string s, int & size){
     int start = 0;
@@ -91,7 +106,7 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
     // std::cout << b <<" *-* " << e << " **" << (*begin).substr(b, e + 1 -b) <<".."<<std::endl;
     _locationPath = (*begin).substr(b, e + 1 -b);
     int size;
-    std::cout << "== " << _locationPath << std::endl;
+    // std::cout << "== " << _locationPath << std::endl;
     begin++;
     if ((*begin).back() == '{')
         begin++;
@@ -108,7 +123,7 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
             if (setLocationIndex(splitIt((*begin).c_str(), size), size))
                 return 1;
         }
-        std::cout << *begin << std::endl;
+        // std::cout << *begin << std::endl;
         begin++;
     }
 
@@ -142,7 +157,9 @@ public:
     int setError(std::string *s, int& size);
     int setIndex(std::string *s, int& size);
     int setAutoIndex(std::string *s, int& size);
+    void addLocation(ServLocation loc);
     void printPorts();
+    std::vector<ServLocation> getLocations();
     std::string gethost();
 };
 
@@ -154,12 +171,19 @@ ServLocation::~ServLocation()
 {
 }
 
-
+std::vector<ServLocation> Server::getLocations(){
+    return _location;
+}
 
 Server::Server(/* args */)
 {
     _isAutoIndex = false;
 }
+
+void Server::addLocation(ServLocation loc){
+    this->_location.push_back(loc);
+}
+
 
 int Server::setError(std::string *s, int& size){
     if (size == 1)
