@@ -14,7 +14,8 @@ public:
     void set_request(std::string req);
     std::string get_request();
     int get_socket();
-    int create_socket();
+    void setSocket(int);
+    int create_socket(int);
     void close_sock();
 };
 
@@ -25,6 +26,11 @@ Socket::Socket(/* args */)
 Socket::~Socket()
 {
 }
+
+void Socket::setSocket(int n){
+    this->sock = n;
+}
+
 void Socket::close_sock(){
     close(sock);
 }
@@ -39,7 +45,7 @@ std::string Socket::get_request(){
 int Socket::get_socket(){
     return this->sock;
 }
-int Socket::create_socket(){
+int Socket::create_socket(int port){
     
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     this->sock = sock;
@@ -50,7 +56,7 @@ int Socket::create_socket(){
     }
     sockaddr_in sock_addr;
     sock_addr.sin_family = AF_INET;
-    sock_addr.sin_port = htons(8000);
+    sock_addr.sin_port = htons(port);
     sock_addr.sin_addr.s_addr = INADDR_ANY;
     socklen_t s_len = sizeof(sock_addr);
     int x = 1;

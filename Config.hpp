@@ -17,14 +17,27 @@ private:
     std::vector<std::string> configVec;
     std::vector<Server> servers;
 public:
-    Config(std::string file);
+    Config();
     ~Config();
     int parse_config();
     int check_brackets(char *s);
     void printConfig();
     int confParse();
+    void setConfigFileName(std::string s);
     int parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e);
+    std::vector<Server>* getServers();
 };
+
+std::vector<Server>* Config::getServers(){
+    if (servers.empty())
+        return nullptr;
+    return &servers;
+}
+
+
+void Config::setConfigFileName(std::string s){
+    config_file = s;
+}
 
 int Config::check_brackets(char *s){
     std::string config = s;
@@ -56,7 +69,6 @@ void getRidOfTabs(std::vector<std::string> &s){
     std::string tmp;
     std::vector<std::string>::iterator it = s.begin();
     for (int i = 0; i < s.size(); i++){
-            std::cout << s[i] << " ==== "<< s[i].find_first_not_of("\t ") << std::endl;
             if (s[i].find_first_not_of("\t ") != -1 )
             {
                 tmp = s[i].substr(s[i].find_first_not_of("\t "));
@@ -127,10 +139,10 @@ int Config::confParse(){
         }
         if (!hash_f)
         {
-            std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
+            // std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
             std::vector<std::string>::iterator bgin = it +b;
             std::vector<std::string>::iterator end = it +c;
-            std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
+            // std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
             if (parse_server(bgin, end))
                 return -1;
         }
@@ -138,25 +150,6 @@ int Config::confParse(){
     }
     return 0;
 }
-
-// std::string* splitIt(std::string s, int & size){
-//     int start = 0;
-//     int end = 0;
-//     std::vector<std::string> tmp;
-//     while (end != -1)
-//     {
-//         end = s.find_first_of(" \t", start);
-//         if (!s.substr(start, end - start).empty())
-//             tmp.push_back(s.substr(start, end - start));
-//         start = end + 1;
-//     }
-//     int x = -1;
-//     size = tmp.size();
-//     std::string *line = new std::string[size];
-//     while (++x < size)
-//         line[x] = tmp[x];
-//     return (line);
-// }
 
 int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e){
     std::vector<std::string> conf(b, e);
@@ -239,7 +232,9 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         std::cout << "error in conf" << std::endl;
         return -1;
     }
-        this->servers.push_back(serv);
+    if (serv.checkServ())
+        return -1;
+    this->servers.push_back(serv);
     return 0;
 }
 /*
@@ -273,21 +268,28 @@ int Config::parse_config()
     if (confParse() < 0)
         return -1;
     
-    printConfig();
+    // printConfig();
     int i = -1;
 
     while (++i < servers.size())
     {
         std::cout << "host is " << this->servers[i].gethost() << std::endl;
+        std::vector<ServLocation>* tmp = (this->servers[i].getLocations());        
         std::cout << "ports are ";
         this->servers[i].printPorts();
-        std::cout << "location path: " << this->servers[i].getLocations()[0].getLocationPath() << std::endl;
-        std::cout << std::endl;
+        if (tmp != nullptr){
+            for (int i = 0; i < tmp->size(); i++)
+            {
+                std::cout << "location path: "  << (*tmp)[i].getLocationPath() << std::endl;
+                std::cout << "location index: "  << (*tmp)[i].getLocationIndex() << std::endl;
+            }
+        }
+        std::cout << "========= Server : "<< i+1 << " done. ==========" << std::endl;
     }
     return 0;
 }
 
-Config::Config(std::string file):config_file(file)
+Config::Config()
 {
 }
 
