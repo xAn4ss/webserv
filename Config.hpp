@@ -8,7 +8,7 @@
 #include <unistd.h> 
 #include <vector>
 #include <iterator>
-#include "Server.hpp"
+#include "ServSock.hpp"
 
 class Config
 {

@@ -8,6 +8,7 @@
 #include <map>
 #include <algorithm>
 #include <dirent.h>
+#include <cstring>
 
 class ServLocation
 {
@@ -94,7 +95,7 @@ int ServLocation::setLocationIndex(std::string* s, int& size){
         std::cout << "wrong server index path"<< std::endl;
         return 1;
     }
-    _index = s[1];
+    _index = path;
     // maybe replace it with path
     return 0;
 }

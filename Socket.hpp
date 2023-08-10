@@ -34,7 +34,9 @@ void Socket::handleRequest(){
     std::cout << "=> " << rqst.get_method() << std::endl;
     std::cout << "=> " << rqst.get_file() << std::endl;
     std::cout << "=> " << rqst.get_http_v() << std::endl;
-    
+    // if (!rqst.get_method().compare("GET")){
+    //     if (!rqst.get_file().compare("/") && )
+    // }
 }
 
 void Socket::setSocket(int n){

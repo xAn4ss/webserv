@@ -2,8 +2,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include "Socket.hpp"
-// #include "Request.hpp"
+// #include "Socket.hpp"
+#include "ServSock.hpp"
 #include "Response.hpp"
 #include "Config.hpp"
 
@@ -38,6 +38,7 @@ int Webserv::startSockets(){
     int max_fd;
     fd_set port_fd;
     std::vector<int> tmp_fd;
+    ServSock servSock;
     while (i < (*config.getServers()).size())    
     {
         std::cout << "Server "<< i + 1<<":\nHost: " << (*config.getServers())[i].gethost() << std::endl;
@@ -84,14 +85,14 @@ int Webserv::startSockets(){
         }
         i++;
     }
-    std::vector<std::pair<Socket, Server>> servSock;
+    // std::vector<std::pair<Socket, Server>> servSock;
     for (std::vector<Socket>::iterator sok = soc.begin(); sok != soc.end();){
         for (std::vector<Server>::iterator srv = (*config.getServers()).begin(); srv != (*config.getServers()).end(); srv++){
             for (int i = 0; i < (*srv).getPorts().size() ; i++)
             {
                 std::cout << "socket : "<< (*sok).get_socket() << std::endl;
                 std::cout << "host : "<< (*srv).getPorts()[i] << std::endl;
-                servSock.push_back(std::make_pair((*sok), (*srv)));
+                servSock.addPair(std::make_pair((*sok), (*srv)));
                 sok++;
             }
         }
@@ -130,7 +131,7 @@ int Webserv::startSockets(){
                     new_sock.setSocket(accept(servSock[i].first.get_socket(), (struct sockaddr*)&soc_address, &addr_len));
                     std::cout << "new sock : " << servSock[i].first.get_socket() << std::endl;
                     // std::cout << "sock : " << soc[i].get_socket() << std::endl;
-                    servSock.push_back(std::make_pair(new_sock, servSock[i].second));
+                    servSock.addPair(std::make_pair(new_sock, servSock[i].second));
                     max_fd = std::max(max_fd, new_sock.get_socket());
                 }else{
                     char buf[1024];
@@ -145,11 +146,12 @@ int Webserv::startSockets(){
                         servSock[i].first.set_request(buf);
                         // soc[i].set_request(buf);
                         std::cout << servSock[i].first.get_request() << std::endl;
-                        servSock[i].first.handleRequest();
+                        // servSock[i].first.handleRequest();
+                        servSock.processConnection(i);
                     }else{
                         std::cout << "~~Disconnected~~" << std::endl;
                         servSock[i].first.close_sock();
-                        servSock.erase(servSock.begin()+i);
+                        servSock.remove(i);
                     }
                 }
             }

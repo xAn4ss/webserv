@@ -37,10 +37,27 @@ public:
     void addLocation(ServLocation loc);
     void printPorts();
     std::vector<ServLocation>* getLocations();
+    ServLocation* getLocation(std::string s);
+
     std::string gethost();
     int checkServ();
     std::vector<int> getPorts();
+    std::string getIndex();
 };
+
+std::string Server::getIndex(){
+    return _index;
+}
+
+ServLocation* Server::getLocation(std::string s){
+    if (_location.empty())
+        return nullptr;
+    for (std::vector<ServLocation>::iterator it = _location.begin(); it != _location.end(); it++){
+        if (!(*it).getLocationPath().compare("/"))
+            return &(*it);
+    }
+    return nullptr;
+}
 
 std::vector<int> Server::getPorts()
 {
@@ -167,7 +184,7 @@ int Server::setIndex(std::string *s, int& size){
         std::cout << "wrong server index path"<< std::endl;
         return 1;
     }
-    _index = s[1];
+    _index = path;
     return 0;
 }
 
