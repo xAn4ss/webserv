@@ -4,10 +4,7 @@
 #include <unistd.h>
 // #include "Socket.hpp"
 #include "ServSock.hpp"
-#include "Response.hpp"
 #include "Config.hpp"
-
-
 class Webserv{
 private:
     std::vector<Socket> soc;

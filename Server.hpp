@@ -43,10 +43,15 @@ public:
     int checkServ();
     std::vector<int> getPorts();
     std::string getIndex();
+    std::string getRoot();
 };
 
 std::string Server::getIndex(){
     return _index;
+}
+
+std::string Server::getRoot(){
+    return _root;
 }
 
 ServLocation* Server::getLocation(std::string s){
@@ -78,8 +83,12 @@ int Server::checkServ(){
     int f = 0;
     for (int i = 0; i < _location.size(); i++)
     {
+        std::cout << _location[i].getLocationPath() << std::endl;
         if (!strncmp("/" ,_location[i].getLocationPath().c_str() , 1))
+        {
+            std::cout << "=> " << f << std::endl;
             f = 1;
+        }
     }
     if (!f && _index.empty())
     {

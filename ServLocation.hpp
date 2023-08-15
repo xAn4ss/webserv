@@ -26,6 +26,7 @@ public:
     ~ServLocation();
     int setLocationRoot(std::string* s, int& size);
     int setLocationIndex(std::string* s, int& size);
+    int setLocationPath(std::string s);
     int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
     std::string getLocationRoot();
     std::string getLocationPath();
@@ -115,6 +116,16 @@ int ServLocation::setLocationRoot(std::string* s, int& size){
     return 0;
 }
 
+int ServLocation::setLocationPath(std::string s)
+{
+    if (!opendir(s.c_str()))
+    {
+        std::cout << "error in location path" << std::endl;
+        return 1;
+    }
+    _locationPath = s;
+    return 0;
+}
 int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::vector<std::string>::iterator end){
     std::vector<std::string> lct(begin, end);
     // std::cout << "-* "<<(*begin).substr((*begin).find_first_of(" \t")+1,
@@ -124,7 +135,8 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
     int e = (*begin).find_last_not_of("{ \t") ;
 
     // std::cout << b <<" *-* " << e << " **" << (*begin).substr(b, e + 1 -b) <<".."<<std::endl;
-    _locationPath = (*begin).substr(b, e + 1 -b);
+    if (setLocationPath((*begin).substr(b, e + 1 -b)))
+        return 1;
     int size;
     begin++;
     if ((*begin).back() == '{')
