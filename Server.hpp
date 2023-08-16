@@ -55,11 +55,14 @@ std::string Server::getRoot(){
 }
 
 ServLocation* Server::getLocation(std::string s){
+            // std::cout << s << "." << std::endl;
     if (_location.empty())
         return nullptr;
     for (std::vector<ServLocation>::iterator it = _location.begin(); it != _location.end(); it++){
-        if (!(*it).getLocationPath().compare("/"))
+        if (!(*it).getLocationPath().compare(s))
+        {
             return &(*it);
+        }
     }
     return nullptr;
 }

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <algorithm>
 #include <stdlib.h>
-
+#include <sys/stat.h>
 class ServSock
 {
 private:
@@ -32,6 +32,7 @@ void ServSock::processConnection(int n){
     // std::cout << "salam "<< std::endl;
     rqst.parse(servSock[n].first.get_request());
         std::cout << "=== " << rqst.get_method() << std::endl;
+        std::cout << "=== " << rqst.get_file() << std::endl;
     if (!rqst.get_method().compare("GET"))
     {
         if (!rqst.get_file().compare("/"))
@@ -65,35 +66,50 @@ void ServSock::processConnection(int n){
         }
         else
         {
-                std::string file;
-            if (servSock[n].second.getLocation("/") != nullptr 
-                && servSock[n].second.getIndex().empty()){
-                    // if (servSock[n].second.getLocation(rqst.get_file()) != nullptr)
-                    // {
-                    //     file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
-                    //     std::cout << "--> " << file << std::endl;
-                    // }
-                    // else
-                        file = (*servSock[n].second.getLocation("/")).getLocationRoot();
+            std::string file;
+            rqst.setFile(rqst.get_file().substr(1, strlen(rqst.get_file().c_str())));
+            struct stat slatt;
+            file = rqst.get_file();
+            if (!stat(rqst.get_file().c_str(), &slatt))
+            {
+                if (servSock[n].second.getLocation(rqst.get_file()) != nullptr)
+                {
+                    // when u give a folder path u get index to that location/folder
+                    file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
+                    std::cout << "==> "<< file << std::endl;
+                    std::cout << "!!!!!!!! " << (*servSock[n].second.getLocation(rqst.get_file())).getLocationPath() << "." << std::endl;
                 }
-            else if (servSock[n].second.getLocation("/") == nullptr 
-                && !servSock[n].second.getIndex().empty())
-                file = servSock[n].second.getRoot();
-                
-            file.erase(file.end()-1);
-            file += rqst.get_file();
+            }
+            else{
+                // if the path requested is a file u have to check for the root in the location 
+                    // or in the server and add it to the path
+                if (servSock[n].second.getLocation("/") != nullptr 
+                    && servSock[n].second.getIndex().empty()){
+                        // if server have locations =
+                        file = (*servSock[n].second.getLocation("/")).getLocationRoot();
+                        file += rqst.get_file();
+                        std::cout << ">>>> "<< file<< std::endl;
+                    }
+                else if (servSock[n].second.getLocation("/") == nullptr 
+                    && !servSock[n].second.getIndex().empty())
+                    {
+                        file = servSock[n].second.getRoot();
+                        file += rqst.get_file();
+                        std::cout << "***> "<< file << std::endl;
+                    }
+                    
+            }
             rsp.set_status(200);
             std::string tmp ;
             tmp += rqst.get_http_v() + " ";
             tmp += std::to_string(rsp.get_status()) + " OK\n";
             tmp += "Content-Type: ";
-            std::cout << file.length() - file.find(".css") << std::endl;
+            std::cout << file.length() - file.find(".html") << std::endl;
             if ((file.length() - file.find(".css")) == 4){
                 tmp += "text/css\n\n";
-            }else if((tmp.length() - tmp.find(".html")) == 5){
+            }else if((file.length() - file.find(".html")) == 5){
                 tmp += "text/html\n\n";
             }
-            // text/html\n\n";
             std::cout << "<========" << file << "=========> "<< std::endl;
             std::ifstream f(file);
             std::string tm;
