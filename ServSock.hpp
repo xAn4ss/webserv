@@ -29,7 +29,6 @@ ServSock::ServSock(/* args */)
 void ServSock::processConnection(int n){
     Request     rqst;
     Response    rsp;
-    // std::cout << "salam "<< std::endl;
     rqst.parse(servSock[n].first.get_request());
         std::cout << "=== " << rqst.get_method() << std::endl;
         std::cout << "=== " << rqst.get_file() << std::endl;
@@ -51,7 +50,7 @@ void ServSock::processConnection(int n){
             tmp += rqst.get_http_v() + " ";
             tmp += rqst.get_method() + " OK\n";
             tmp += "Content-Type: text/html\n\n";
-            std::ifstream f(path);
+            std::ifstream f(path); 
             std::string tm;
             while (getline(f, tm)){
                 tmp += tm + '\n';
@@ -60,9 +59,7 @@ void ServSock::processConnection(int n){
             if (send(servSock[n].first.get_socket(), tmp.c_str(), strlen(tmp.c_str()), 0) == -1){
                 std::cout << "error" << std::endl;
             }
-            servSock[n].first.close_sock();
-            servSock.erase(servSock.begin() + n); 
-            std::cout << "====" << std::endl;              
+             
         }
         else
         {
@@ -72,12 +69,12 @@ void ServSock::processConnection(int n){
             file = rqst.get_file();
             if (!stat(rqst.get_file().c_str(), &slatt))
             {
-                if (servSock[n].second.getLocation(rqst.get_file()) != nullptr)
+                if (servSock[n].second.getLocation(rqst.get_file()))
                 {
                     // when u give a folder path u get index to that location/folder
                     file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
                     std::cout << "==> "<< file << std::endl;
-                    std::cout << "!!!!!!!! " << (*servSock[n].second.getLocation(rqst.get_file())).getLocationPath() << "." << std::endl;
+                    std::cout << "!!!!!!!!" << std::endl;
                 }
             }
             else{
@@ -85,7 +82,7 @@ void ServSock::processConnection(int n){
                     // or in the server and add it to the path
                 if (servSock[n].second.getLocation("/") != nullptr 
                     && servSock[n].second.getIndex().empty()){
-                        // if server have locations =
+                        // file = locationroot + file requested
                         file = (*servSock[n].second.getLocation("/")).getLocationRoot();
                         file += rqst.get_file();
                         std::cout << ">>>> "<< file<< std::endl;
@@ -93,6 +90,7 @@ void ServSock::processConnection(int n){
                 else if (servSock[n].second.getLocation("/") == nullptr 
                     && !servSock[n].second.getIndex().empty())
                     {
+                        // file = servRoot + file requested;
                         file = servSock[n].second.getRoot();
                         file += rqst.get_file();
                         std::cout << "***> "<< file << std::endl;
@@ -120,10 +118,10 @@ void ServSock::processConnection(int n){
             if (send(servSock[n].first.get_socket(), tmp.c_str(), strlen(tmp.c_str()), 0) == -1){
             std::cout << "error" << std::endl;
             }
-            std::cout << "====" << std::endl; 
-            servSock[n].first.close_sock();
-            servSock.erase(servSock.begin() + n);                 
         }
+        std::cout << "====" << std::endl; 
+        servSock[n].first.close_sock();
+        servSock.erase(servSock.begin() + n); 
     }
 }
 
