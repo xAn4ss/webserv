@@ -34,47 +34,61 @@ void ServSock::processConnection(int n){
         std::cout << "=== " << rqst.get_file() << std::endl;
     if (!rqst.get_method().compare("GET"))
     {
-        if (!rqst.get_file().compare("/"))
-        {
-            std::string path;
-            if (servSock[n].second.getLocation("/") != nullptr 
-                && servSock[n].second.getIndex().empty())
-            {
-                path = (*servSock[n].second.getLocation("/")).getLocationIndex();
-            }else
-                path = servSock[n].second.getIndex();
-                // looks for index in location
-            std::cout << path << std::endl;
-            rsp.set_status(200);
-            std::string tmp ;
-            tmp += rqst.get_http_v() + " ";
-            tmp += rqst.get_method() + " OK\n";
-            tmp += "Content-Type: text/html\n\n";
-            std::ifstream f(path); 
-            std::string tm;
-            while (getline(f, tm)){
-                tmp += tm + '\n';
-            }
-            std::cout << "==> "<< tmp << std::endl;
-            if (send(servSock[n].first.get_socket(), tmp.c_str(), strlen(tmp.c_str()), 0) == -1){
-                std::cout << "error" << std::endl;
-            }
+        // if (!rqst.get_file().compare("/"))
+        // {
+        //     std::string path;
+        //     if (servSock[n].second.getLocation("/") != nullptr 
+        //         && servSock[n].second.getIndex().empty())
+        //     {
+        //         path = (*servSock[n].second.getLocation("/")).getLocationIndex();
+        //     }else
+        //         path = servSock[n].second.getIndex();
+        //         // looks for index in location
+        //     std::cout << path << std::endl;
+        //     rsp.set_status(200);
+        //     std::string tmp ;
+        //     tmp += rqst.get_http_v() + " ";
+        //     tmp += rqst.get_method() + " OK\n";
+        //     tmp += "Content-Type: text/html\n\n";
+        //     std::ifstream f(path); 
+        //     std::string tm;
+        //     while (getline(f, tm)){
+        //         tmp += tm + '\n';
+        //     }
+        //     std::cout << "==> "<< tmp << std::endl;
+        //     if (send(servSock[n].first.get_socket(), tmp.c_str(), strlen(tmp.c_str()), 0) == -1){
+        //         std::cout << "error" << std::endl;
+        //     }
              
-        }
-        else
-        {
+        // }
+        // else
+        // {
+
+        // if dir => check index of that directory in server lcoation
+        // else if file 
+        //      => locationroot + file;
+        //      => serverRoot + file;
+
             std::string file;
-            rqst.setFile(rqst.get_file().substr(1, strlen(rqst.get_file().c_str())));
+            if (rqst.get_file().compare("/"))
+                rqst.setFile(rqst.get_file().substr(1, strlen(rqst.get_file().c_str())));
             struct stat slatt;
             file = rqst.get_file();
             if (!stat(rqst.get_file().c_str(), &slatt))
             {
+                std::cout << "-*-*-*--*-*-" << rqst.get_file() << "*-*-*-*--*-*--*-" << std::endl;
                 if (servSock[n].second.getLocation(rqst.get_file()))
                 {
                     // when u give a folder path u get index to that location/folder
                     file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
                     std::cout << "==> "<< file << std::endl;
                     std::cout << "!!!!!!!!" << std::endl;
+                    rsp.set_status(200);
+                }
+                else
+                {
+                    std::cout << ":::::"<< rqst.get_file() <<"::::" << std::endl;
+                    rsp.set_status(301);
                 }
             }
             else{
@@ -83,24 +97,30 @@ void ServSock::processConnection(int n){
                 if (servSock[n].second.getLocation("/") != nullptr 
                     && servSock[n].second.getIndex().empty()){
                         // file = locationroot + file requested
-                        file = (*servSock[n].second.getLocation("/")).getLocationRoot();
+                        file = (*servSock[n].second.getLocation("/") ).getLocationIndex();
                         file += rqst.get_file();
-                        std::cout << ">>>> "<< file<< std::endl;
+                        std::cout << rqst.get_file() <<">>>> "<< file<< std::endl;
+                        rsp.set_status(200);
                     }
-                else if (servSock[n].second.getLocation("/") == nullptr 
+                else if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
                     && !servSock[n].second.getIndex().empty())
                     {
                         // file = servRoot + file requested;
                         file = servSock[n].second.getRoot();
                         file += rqst.get_file();
                         std::cout << "***> "<< file << std::endl;
+                        rsp.set_status(200);
                     }
                     
             }
-            rsp.set_status(200);
+
             std::string tmp ;
             tmp += rqst.get_http_v() + " ";
-            tmp += std::to_string(rsp.get_status()) + " OK\n";
+            tmp += std::to_string(rsp.get_status());
+            if (rsp.get_status() == 200)
+                tmp += " OK\n";
+            else if (rsp.get_status() == 301)
+                tmp += " Moved Permantely\nLocation: " + file +"/\n";
             tmp += "Content-Type: ";
             std::cout << file.length() - file.find(".html") << std::endl;
             if ((file.length() - file.find(".css")) == 4){
@@ -108,7 +128,7 @@ void ServSock::processConnection(int n){
             }else if((file.length() - file.find(".html")) == 5){
                 tmp += "text/html\n\n";
             }
-            std::cout << "<========" << file << "=========> "<< std::endl;
+            std::cout << rqst.get_file() << "<========" << file << "=========> "<< std::endl;
             std::ifstream f(file);
             std::string tm;
             while (getline(f, tm)){
@@ -118,7 +138,7 @@ void ServSock::processConnection(int n){
             if (send(servSock[n].first.get_socket(), tmp.c_str(), strlen(tmp.c_str()), 0) == -1){
             std::cout << "error" << std::endl;
             }
-        }
+        // }
         std::cout << "====" << std::endl; 
         servSock[n].first.close_sock();
         servSock.erase(servSock.begin() + n); 

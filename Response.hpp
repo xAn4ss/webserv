@@ -16,7 +16,7 @@ public:
 };
 
 void Response::set_status(int code){
-    this->status = code;
+        this->status = code;
 }
 
 int Response::get_status(){
