@@ -3,7 +3,6 @@
 
 #include "Socket.hpp"
 #include "Server.hpp"
-#include <fstream>
 #include <algorithm>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -46,18 +45,20 @@ void ServSock::processConnection(int n){
             // file = rqst.get_file();
             if (!stat(rqst.get_file().c_str(), &slatt))
             {
-                std::cout << "-*-*-*--*-*-" << rqst.get_file() << "*-*-*-*--*-*--*-" << std::endl;
+                std::cout <<stat(rqst.get_file().c_str(), &slatt)<< "-*-*-*--*-*-" << rqst.get_file() << "*-*-*-*--*-*--*-" << std::endl;
                 if (S_ISDIR(slatt.st_mode))
                 {
                     std::cout << "dir "<< std::endl;
                     if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
                         && !servSock[n].second.getIndex().empty()){
                             struct stat t;
-                            if (!stat(rqst.get_file().c_str(), &t))
+                            std::cout << stat(rqst.get_file().c_str(), &t) << std::endl;
+                            if (!stat(rqst.get_file().c_str(), &t) && rqst.get_file().compare("/")){
                                 rsp.set_status(403);
+                            }
                             else{
-                                file = servSock[n].second.getIndex();
                                 rsp.set_status(200);
+                                file = servSock[n].second.getIndex();
                             }
                         std::cout << "... " << file << std::endl; 
                     }
@@ -69,13 +70,15 @@ void ServSock::processConnection(int n){
                     {
                         file = rqst.get_file() + "/";
                         rsp.set_status(301);
-                    }
+                    }else
+                        rsp.set_status(403);
                 }else{
                     std::cout << "file" << std::endl;
                     std::string path;
                     if (!access(rqst.get_file().c_str(), F_OK))
                     { // if path requested exists file = path
-                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")))){
+                        std::cout << rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1) << std::endl;
+                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
                             file = rqst.get_file();
                             rsp.set_status(200);
                         }else

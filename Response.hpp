@@ -1,4 +1,5 @@
 #ifndef RESPONSE_HPP
+#include <fstream>
 #include <iostream>
 #include "Request.hpp"
 class Response
@@ -23,7 +24,7 @@ void Response::BuildResponse(Request rqst ,std::string file){
                 body += " OK\n";
             else if (status == 301)
                 body += " Moved Permantely\nLocation: " + file +"\n";
-            body += " Content-Type: ";
+            body += "Content-Type: ";
             std::cout << file.length() - file.find(".html") << std::endl;
             if ((file.length() - file.find(".css")) == 4){
                 body += "text/css\n\n";
