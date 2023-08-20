@@ -2,7 +2,8 @@
 #define SOCKET_HPP
 #include <unistd.h>
 #include <iostream>
-#include "Request.hpp"
+#include "Response.hpp"
+
 class Socket
 {
 private:

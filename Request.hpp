@@ -1,5 +1,4 @@
 #ifndef REQUEST_HPP
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <stack>
