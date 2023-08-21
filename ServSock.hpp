@@ -18,10 +18,48 @@ public:
     void addPair(std::pair<Socket, Server>);
     std::pair<Socket, Server>& operator[](int);
     void processConnection(int);
+    void buildResponse(int, std::string, Response&, Request);
+    void handleErrors(int, Response&, Request);
 };
+void ServSock::handleErrors(int n, Response& rsp, Request rqst){
+
+}
 
 ServSock::ServSock(/* args */)
 {
+}
+
+void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqst){
+    rsp + (rqst.get_http_v() + " ");
+    rsp + std::to_string(rsp.get_status());
+    if (rsp.get_status() == 200)
+        rsp + " OK\n";
+    else if (rsp.get_status() == 301)
+        rsp + (" Moved Permantely\nLocation: " + file +"\n");
+    else{
+        file = servSock[n].
+        if (rsp.get_status() == 404){
+            file = std::to_string(rsp.get_status()) + ".html";
+            rsp + " Not Found";
+        }else if (rsp.get_status() == 403){
+            rsp + " Forbidden";
+        }else
+            rsp + " undefined";
+        rsp + "\n";
+    }
+    rsp + "Content-Type: ";
+    std::cout << file.length() - file.find(".html") << std::endl;
+    if ((file.length() - file.find(".css")) == 4){
+        rsp + "text/css\n\n";
+    }else if((file.length() - file.find(".html")) == 5){
+        rsp + "text/html\n\n";
+    }
+    std::ifstream f(file);
+    std::string tm;
+    while (getline(f, tm)){
+        rsp + (tm + '\n');
+    }
+    std::cout << file << " ==> "<< rsp.get_request() << std::endl;
 }
 
 void ServSock::processConnection(int n){
@@ -114,8 +152,7 @@ void ServSock::processConnection(int n){
                     
             }
             std::cout << rqst.get_file() << "<========" << file << "=========> "<< std::endl;
-            rsp.BuildResponse(rqst, file);
-
+            buildResponse(n, file, rsp, rqst);
             if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
             std::cout << "error" << std::endl;
             }
