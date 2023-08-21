@@ -52,16 +52,23 @@ void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqs
     }
     rsp + "Content-Type: ";
     std::cout << file.length() - file.find(".html") << std::endl;
-    if ((file.length() - file.find(".css")) == 4){
-        rsp + "text/css\n\n";
-    }else if((file.length() - file.find(".html")) == 5){
-        rsp + "text/html\n\n";
-    }
+    if ((file.length() - file.find(".css")) == 4)
+        rsp + "text/css\n";
+    else if((file.length() - file.find(".html")) == 5)
+        rsp + "text/html\n";
+    else if ((file.length() - file.find(".jpeg")) == 5)
+        rsp + "image/jpeg\n";    
+    else if ((file.length() - file.find(".png")) == 4)
+        rsp + "image/png\n";
+    std::string fileContent;
     std::ifstream f(file);
     std::string tm;
     while (getline(f, tm)){
-        rsp + (tm + '\n');
+        fileContent += (tm);
     }
+    rsp + ("Content-Length: " + std::to_string(fileContent.size())+ "\n\n"); 
+    rsp + fileContent;
+    std::cout << "§§" << rsp.get_request() << std::endl;
 }
 
 void ServSock::processConnection(int n){
@@ -77,7 +84,8 @@ void ServSock::processConnection(int n){
         // else if file 
         //      => locationroot + file;
         //      => serverRoot + file;
-
+            if (rqst.get_file() == "/favicon.ico")
+                return;
             std::string file;
             if (rqst.get_file().compare("/"))
                 rqst.setFile(rqst.get_file().substr(1, strlen(rqst.get_file().c_str())));
@@ -118,14 +126,14 @@ void ServSock::processConnection(int n){
                     if (!access(rqst.get_file().c_str(), F_OK))
                     { // if path requested exists file = path
                         std::cout << rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1) << std::endl;
-                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
+                        // if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
                             file = rqst.get_file();
                             rsp.set_status(200);
-                        }else if (rqst.get_file().find(servSock[n].second.getErrorPath()) != -1){
-                            file = rqst.get_file();
-                            rsp.set_status(200);
-                        }else
-                            rsp.set_status(403);
+                        // }else if (rqst.get_file().find(servSock[n].second.getErrorPath()) != -1){
+                        //     file = rqst.get_file();
+                        //     rsp.set_status(200);
+                        // }else
+                        //     rsp.set_status(403);
                         std::cout << "&&& " << file << std::endl; 
                     }
                 }
