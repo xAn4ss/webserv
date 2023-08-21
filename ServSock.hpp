@@ -121,6 +121,9 @@ void ServSock::processConnection(int n){
                         if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
                             file = rqst.get_file();
                             rsp.set_status(200);
+                        }else if (rqst.get_file().find(servSock[n].second.getErrorPath()) != -1){
+                            file = rqst.get_file();
+                            rsp.set_status(200);
                         }else
                             rsp.set_status(403);
                         std::cout << "&&& " << file << std::endl; 
