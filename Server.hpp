@@ -44,7 +44,16 @@ public:
     std::vector<int> getPorts();
     std::string getIndex();
     std::string getRoot();
+    std::string getErrorPath();
 };
+
+std::string Server::getErrorPath(){
+    if (_error_path.back() == '/')
+        return _error_path;
+    else
+        return _error_path + "/";
+}
+
 
 std::string Server::getIndex(){
     return _index;
@@ -144,7 +153,8 @@ int Server::setError(std::string *s, int& size){
         {
             std::cout << "error pages path is wrong" << std::endl;
             return 1;
-        }
+        }else
+            _error_path = s[i];
     }
 
     return 0;

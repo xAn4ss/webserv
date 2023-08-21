@@ -37,15 +37,18 @@ void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqs
     else if (rsp.get_status() == 301)
         rsp + (" Moved Permantely\nLocation: " + file +"\n");
     else{
-        file = servSock[n].
+        std::cout << " ========> " << std::endl;
+        file = servSock[n].second.getErrorPath();
         if (rsp.get_status() == 404){
-            file = std::to_string(rsp.get_status()) + ".html";
+            file += std::to_string(rsp.get_status()) + ".html";
             rsp + " Not Found";
         }else if (rsp.get_status() == 403){
+            file += std::to_string(rsp.get_status()) + ".html";
             rsp + " Forbidden";
         }else
             rsp + " undefined";
         rsp + "\n";
+        std::cout << file << " ==> "<< rsp.get_request() << std::endl;
     }
     rsp + "Content-Type: ";
     std::cout << file.length() - file.find(".html") << std::endl;
@@ -59,7 +62,6 @@ void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqs
     while (getline(f, tm)){
         rsp + (tm + '\n');
     }
-    std::cout << file << " ==> "<< rsp.get_request() << std::endl;
 }
 
 void ServSock::processConnection(int n){
