@@ -6,10 +6,13 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 class ServSock
 {
 private:
     std::vector<std::pair<Socket, Server>> servSock;
+    int i;
+    std::string t;
 public:
     ServSock(/* args */);
     ~ServSock();
@@ -20,6 +23,7 @@ public:
     void processConnection(int);
     void buildResponse(int, std::string, Response&, Request);
     void handleErrors(int, Response&, Request);
+    std::string fct(std::string file);
 };
 void ServSock::handleErrors(int n, Response& rsp, Request rqst){
 
@@ -27,7 +31,44 @@ void ServSock::handleErrors(int n, Response& rsp, Request rqst){
 
 ServSock::ServSock(/* args */)
 {
+    i = 0;
 }
+
+std::string ServSock::fct(std::string file){
+    std::cout << "*/**/**/*/*/*/***/*/" << std::endl;
+    int fd = open(file.c_str(), O_RDONLY);
+    if (fd == -1){
+        std::cout << "apah"<< std::endl;
+        exit(0);
+    }
+    lseek(fd, i, SEEK_SET);
+    if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        std::cout << "error fcntl" << std::endl;
+        exit(0);
+    }
+    
+    char buf[2048];
+    int size = read(fd, buf, 2048);
+    if (size == 0){
+        std::cout << "plplpl" << std::endl;
+        i = 0;
+        close(fd);
+        return ("0\r\n\r\n");
+    }
+    else if (size == -1)
+    {
+        std::cout << "plp-1lpl" << std::endl;
+        close(fd);
+        exit(0);
+    }
+    std::string tmp(buf, size);
+    i += size;
+    close(fd);
+    // std::cout << i <<" ====> "<< tmp << std::endl;
+    return tmp;
+}
+
 
 void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqst){
     std::cout << file << " ===== " << rsp.get_status() << std::endl;
@@ -51,83 +92,49 @@ void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqs
         rsp + "\r\n";
         std::cout << file << " ==> "<< rsp.get_request() << std::endl;
     }
-    rsp + "Content-Type: ";
+    // rsp + "Content-Type: ";
     std::cout << file.length() - file.find(".html") << std::endl;
     if ((file.length() - file.find(".css")) == 4)
-        rsp + "text/css\n";
+        rsp + "Content-Type: text/css\n";
     else if((file.length() - file.find(".html")) == 5)
-        rsp + "text/html\n";
+        rsp + "Content-Type: text/html\n";
     else if ((file.length() - file.find(".jpeg")) == 5){
-        rsp + "image/jpeg\n";
         std::ifstream s(file, std::ios::binary);
         std::vector<char> vec;
         char c;
-        int x = 0;
         while (s.get(c))
-        {
             vec.push_back(c);
-            x++;
-        }
         std::string tmp(vec.begin(), vec.end());
         s.close();
-        // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
-        // std::cout << "" <<  tmp;
-        rsp + ("Content-Length: " + std::to_string(x) + "\r\n\r\n");
-        // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
+        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\r\n");
+        rsp + "Content-Type: image/jpeg\r\n\r\n";
         rsp + tmp;
         std::cout << "**" << rsp.get_request() << std::endl;
         return;
     }
     else if ((file.length() - file.find(".png")) == 4)
     {
-        rsp + "image/png\n";
+        // std::cout << "... "<< t << std::endl;
+        std::ifstream s(file, std::ios::binary);
+        std::vector<char> vec;
+        char c;
+        while (s.get(c))
+            vec.push_back(c);
+        std::string tmp(vec.begin(), vec.end());
+        s.close();
+        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\n");
+        rsp + "Content-Type: image/png\r\n\r\n";
+        std::string tp;
+        while ((tp = fct(file)) != "0\r\n\r\n")
+        {
+            t += tp;
+        }
+        t += "0\r\n\r\n";
+        std::cout << ">> >>" << t << std::endl;
 
-        std::ifstream tmp(file, std::ios::binary);
-        if (!tmp.is_open())
-        {
-            std::cout << "apaaah";
-            return;
-        }
-        int size = tmp.tellg();
-        char s[size];
-        tmp.seekg(0, std::ios::beg);
-        if (tmp.read(s, size))
-        {
-            std::cout << "apaaaaaaah";
-            return;
-        }
-        
-        // std::ifstream s(file, std::ios::binary);
-        // std::vector<char> vec;
-        // char c;
-        // int x = 0;
-        // while (s.get(c)){        // std::ifstream s(file, std::ios::binary);
-        // std::vector<char> vec;
-        // char c;
-        // int x = 0;
-        // while (s.get(c)){
-        //     vec.push_back(c);
-        //     x++;
-        // }
-        // std::string tmp(vec.begin(), vec.end());
-        // s.close();
-        // // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
-        // // std::cout << "" <<  tmp;
-        // rsp + ("Content-Length: " + std::to_string(x) + "\r\n\r\n");
-        // // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
-        // rsp + tmp;
-        // std::cout << "**" << rsp.get_request() << std::endl;
-        //     vec.push_back(c);
-        //     x++;
-        // }
-        // std::string tmp(vec.begin(), vec.end());
-        // s.close();
-        // // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
-        // // std::cout << "" <<  tmp;
-        // rsp + ("Content-Length: " + std::to_string(x) + "\r\n\r\n");
-        // // std::cout << std::endl << "=+=+=+=+=+=+=+" << std::endl;
-        // rsp + tmp;
-        // std::cout << "**" << rsp.get_request() << std::endl;
+        rsp + t;
+        // t += fct(file);
+        std::cout << "**" << rsp.get_request() << std::endl;
         return;
     }
     std::string fileContent;
@@ -235,8 +242,8 @@ void ServSock::processConnection(int n){
                     }
                     
             }
-            std::cout << rqst.get_file() << "<========" << file << "=========> "<< std::endl;
             buildResponse(n, file, rsp, rqst);
+            // std::cout << rsp.get_request() << "<========" << file << "=========> "<< std::endl;
             if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
             std::cout << "error" << std::endl;
             }
