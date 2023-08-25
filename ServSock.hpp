@@ -23,7 +23,7 @@ public:
     void processConnection(int);
     void buildResponse(int, std::string, Response&, Request);
     void handleErrors(int, Response&, Request);
-    std::string fct(std::string file);
+    std::string fct(std::string file, int& s);
 };
 void ServSock::handleErrors(int n, Response& rsp, Request rqst){
 
@@ -34,7 +34,7 @@ ServSock::ServSock(/* args */)
     i = 0;
 }
 
-std::string ServSock::fct(std::string file){
+std::string ServSock::fct(std::string file, int& s){
     std::cout << "*/**/**/*/*/*/***/*/" << std::endl;
     int fd = open(file.c_str(), O_RDONLY);
     if (fd == -1){
@@ -47,9 +47,13 @@ std::string ServSock::fct(std::string file){
         std::cout << "error fcntl" << std::endl;
         exit(0);
     }
-    
-    char buf[2048];
-    int size = read(fd, buf, 2048);
+    int chunk;
+    if (s < 2048)
+        chunk = 2048 - s;
+    else
+        chunk = 2048;
+    char buf[chunk];
+    int size = read(fd, buf, chunk);
     if (size == 0){
         std::cout << "plplpl" << std::endl;
         i = 0;
@@ -64,8 +68,9 @@ std::string ServSock::fct(std::string file){
     }
     std::string tmp(buf, size);
     i += size;
+    s -= size;
     close(fd);
-    // std::cout << i <<" ====> "<< tmp << std::endl;
+    std::cout << i <<" ====> "<< tmp << std::endl;
     return tmp;
 }
 
@@ -125,16 +130,44 @@ void ServSock::buildResponse(int n, std::string file, Response& rsp, Request rqs
         rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\n");
         rsp + "Content-Type: image/png\r\n\r\n";
         std::string tp;
-        while ((tp = fct(file)) != "0\r\n\r\n")
+        int x = tmp.size();
+        send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
+        while ((tp = fct(file, x)) != "0\r\n\r\n")
         {
-            t += tp;
+            std::cout << x << "<<";
+            // t += tp;
+            send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
         }
-        t += "0\r\n\r\n";
-        std::cout << ">> >>" << t << std::endl;
+        tp = "0\r\n\r\n";
+        // std::cout << ">> >>" << t << std::endl;
+        send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
 
-        rsp + t;
         // t += fct(file);
-        std::cout << "**" << rsp.get_request() << std::endl;
+        // std::cout << "**" << rsp.get_request() << std::endl;
+        return;
+    }
+    else if ((file.length() - file.find(".mp4")) == 4){
+        std::ifstream s(file, std::ios::binary);
+        std::vector<char> vec;
+        char c;
+        while (s.get(c))
+            vec.push_back(c);
+        std::string tmp(vec.begin(), vec.end());
+        s.close();
+        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\n");
+        rsp + "Content-Type: video/mp4\r\n\r\n";
+        std::string tp;
+        int x = tmp.size();
+        send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
+        while ((tp = fct(file, x)) != "0\r\n\r\n")
+        {
+            std::cout << x << "<<";
+            // t += tp;
+            send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+        }
+        tp = "0\r\n\r\n";
+        // std::cout << ">> >>" << t << std::endl;
+        send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
         return;
     }
     std::string fileContent;

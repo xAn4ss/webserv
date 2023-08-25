@@ -6,3 +6,10 @@ h1{
     font-weight: bolder;
     color: red;
 }
+
+img {
+    margin-top: 7px;
+    margin-top: 10px;
+    height: 5%;
+    width: 5%;
+}
