@@ -36,7 +36,6 @@ ServSock::ServSock(/* args */)
 }
 
 std::string ServSock::fct(std::string file, int& s){
-    std::cout << "*/**/**/*/*/*/***/*/" << std::endl;
     int fd = open(file.c_str(), O_RDONLY);
     if (fd == -1){
         std::cout << "apah"<< std::endl;
@@ -69,7 +68,6 @@ std::string ServSock::fct(std::string file, int& s){
     i += size;
     s -= size;
     close(fd);
-    std::cout << i <<" ====> "<< tmp << std::endl;
     return tmp;
 }
 
@@ -99,8 +97,19 @@ void ServSock::buildHead(int n, Response& rsp, Request rqst){
         rsp + "\r\n";
     }
 }
-void ServSock::buildResponse(int n, Response& rsp, Request rqst){
+void setContentLength(Response& rsp, std::string& data, std::string file){
+    std::ifstream s(file, std::ios::binary);
+    std::vector<char> vec;
+    char c;
+    while (s.get(c))
+        vec.push_back(c);
+    std::string tmp(vec.begin(), vec.end());
+    data = tmp;
+    s.close();
+    rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\r\n\r\n");
+}
 
+void ServSock::buildResponse(int n, Response& rsp, Request rqst){
     std::string data;
     int chunked = 0;
     buildHead(n, rsp, rqst);
@@ -110,45 +119,21 @@ void ServSock::buildResponse(int n, Response& rsp, Request rqst){
         rsp + "Content-Type: text/html\n";
     else if ((file.length() - file.find(".jpeg")) == 5){
         chunked = 1;
-        std::ifstream s(file, std::ios::binary);
-        std::vector<char> vec;
-        char c;
-        while (s.get(c))
-            vec.push_back(c);
-        std::string tmp(vec.begin(), vec.end());
-        data = tmp;
-        s.close();
-        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\n");
-        rsp + "Content-Type: image/jpeg\r\n\r\n";
+        rsp + "Content-Type: image/jpeg\r\n";
+        setContentLength(rsp, data, file);
     }
     else if ((file.length() - file.find(".png")) == 4)
     {
         chunked = 1;
-        std::ifstream s(file, std::ios::binary);
-        std::vector<char> vec;
-        char c;
-        while (s.get(c))
-            vec.push_back(c);
-        std::string tmp(vec.begin(), vec.end());
-        data = tmp;
-        s.close();
         rsp + "Content-Type: image/png\r\n";
-        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\r\n\r\n");
+        setContentLength(rsp, data, file);
     }
     else if ((file.length() - file.find(".mp4")) == 4){
         chunked = 1;
-        std::ifstream s(file, std::ios::binary);
-        std::vector<char> vec;
-        char c;
-        while (s.get(c))
-            vec.push_back(c);
-        std::string tmp(vec.begin(), vec.end());
-        data = tmp;
-        s.close();
-        rsp + "Content-Type: video/mp4\n";
-        rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\r\n\r\n");
-
+        rsp + "Content-Type: video/mp4\r\n";
+        setContentLength(rsp, data, file);
     }
+
     if (chunked){
         std::string tp;
         int x = data.size();
@@ -202,16 +187,12 @@ void ServSock::processConnection(int n){
                     if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
                         && !servSock[n].second.getIndex().empty()){
                             struct stat t;
-                            std::cout << stat(rqst.get_file().c_str(), &t) << std::endl;
-                            if (!stat(rqst.get_file().c_str(), &t) && rqst.get_file().compare("/")){
+                            if (rqst.get_file().compare("/"))
                                 rsp.set_status(403);
-                                std::cout << ">>>>";
-                            }
                             else{
                                 rsp.set_status(200);
                                 file = servSock[n].second.getIndex();
                             }
-                        std::cout << "... " << file << std::endl; 
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()))
                     {    // when u give a folder path u get index to that location/folder
@@ -232,12 +213,6 @@ void ServSock::processConnection(int n){
                         // if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
                             file = rqst.get_file();
                             rsp.set_status(200);
-                        // }else if (rqst.get_file().find(servSock[n].second.getErrorPath()) != -1){
-                        //     file = rqst.get_file();
-                        //     rsp.set_status(200);
-                        // }else
-                        //     rsp.set_status(403);
-                        std::cout << "&&& " << file << std::endl; 
                     }
                 }
             }else{
@@ -252,7 +227,6 @@ void ServSock::processConnection(int n){
                             rsp.set_status(200);
                         }else
                             rsp.set_status(404);
-                        std::cout <<">>>> "<< file<< std::endl;
                     }
                 else if (servSock[n].second.getLocation("/") == nullptr 
                     && !servSock[n].second.getIndex().empty())
@@ -263,17 +237,13 @@ void ServSock::processConnection(int n){
                             rsp.set_status(200);
                         }else
                             rsp.set_status(404);
-                        std::cout << "***> "<< file << std::endl;
                     }
                     
             }
             buildResponse(n, rsp, rqst);
-            // std::cout << rsp.get_request() << "<========" << file << "=========> "<< std::endl;
             if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
             std::cout << "error" << std::endl;
             }
-            // }
-            std::cout << "====" << std::endl; 
             servSock[n].first.close_sock();
             servSock.erase(servSock.begin() + n); 
     }
