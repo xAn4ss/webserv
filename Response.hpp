@@ -6,7 +6,7 @@ class Response
 {
 private:
     int status;
-    std::string body;
+    std::string data;
 public:
     Response();
     ~Response();
@@ -19,12 +19,12 @@ public:
 };
 
 void Response::operator+(std::string s){
-    body += s;
+    data += s;
 }
 
 
 std::string Response::get_request(){
-    return body;
+    return data;
 }
 
 void Response::set_status(int code){
