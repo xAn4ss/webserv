@@ -39,11 +39,14 @@ void ServSock::sendResponse(int n, Response rsp){
         std::string tp;
         int x = chunkedData.size();
         send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
+        std::cout << "§§" << rsp.get_request() << std::endl;
         while (!(tp = fct(file, x)).empty())
         {
             send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+            std::cout << "§§" << tp << std::endl;    
             if (tp == "0\r\n\r\n"){
                 send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+                std::cout << "§§" << tp << std::endl;    
                 break;
             }
         }
@@ -52,6 +55,8 @@ void ServSock::sendResponse(int n, Response rsp){
     exit(0);
     /*****************/
     }
+    std::cout << "§§" << rsp.get_request() << std::endl;
+
 }
 
 ServSock::ServSock(/* args */)
@@ -170,7 +175,6 @@ void ServSock::buildResponse(int n, Response& rsp, Request rqst){
         }
         rsp + ("Content-Length: " + std::to_string(fileContent.length())+ "\r\n\r\n");
         rsp + fileContent;
-        std::cout << "§§" << rsp.get_request() << std::endl;
     }
 }
 
