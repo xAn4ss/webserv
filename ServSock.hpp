@@ -29,27 +29,29 @@ public:
     void buildHead(int n, Response&, Request);
     void sendResponse(int, Response);
 };
+
 void ServSock::handleErrors(int n, Response& rsp, Request rqst){
 
 }
 
 void ServSock::sendResponse(int n, Response rsp){
-            if (chunked){
-                std::string tp;
-                int x = chunkedData.size();
-                send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
-                while (!(tp = fct(file, x)).empty())
-                {
-                    send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
-                    if (tp == "0\r\n\r\n"){
-                        send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
-                        break;
-                    }
-                }
-            }else if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
-            std::cout << "error" << std::endl;
-            exit(0);/*****************/
+    if (chunked){
+        std::string tp;
+        int x = chunkedData.size();
+        send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
+        while (!(tp = fct(file, x)).empty())
+        {
+            send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+            if (tp == "0\r\n\r\n"){
+                send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+                break;
             }
+        }
+    }else if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
+    std::cout << "error" << std::endl;
+    exit(0);
+    /*****************/
+    }
 }
 
 ServSock::ServSock(/* args */)
@@ -275,8 +277,10 @@ void ServSock::addPair(std::pair<Socket, Server> ss){
 std::pair<Socket, Server>& ServSock::operator[](int i){
     return servSock[i];
 }
+
 ServSock::~ServSock()
 {
+    
 }
 
 
