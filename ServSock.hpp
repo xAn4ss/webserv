@@ -185,6 +185,7 @@ void ServSock::processConnection(int n){
         std::cout << "=== " << rqst.get_method() << std::endl;
         std::cout << "=== " << rqst.get_file() << std::endl;
     rsp.set_status(200);
+    int autIndexed = 0;
     if (!rqst.get_method().compare("GET"))
     {
         // if dir => check index of that directory in server lcoation
@@ -213,6 +214,25 @@ void ServSock::processConnection(int n){
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()))
                     {    // when u give a folder path u get index to that location/folder
+                        if (servSock[n].second.getAutoIndex())
+                        {
+                            autIndexed = 1;
+                            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+                            response += "<html><head><title>Index of ";
+                            response += "auto index test";
+                            response += "</title></head><body><h1>Index of ";
+                            response += "AutoIndex Test";
+                            response += "</h1><ul>";
+                            response += "<li><a href=\"";
+                            response += "test/test.html";
+                            response += "\">";
+                            response += "Testing ...";
+                            response += "</a></li>";
+                            response += "</ul></body></html>";
+                            rsp + response;
+                        }
+                            std::cout << ">>>>>>>" << rsp.get_request() <<std::endl;
+
                         file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
                         rsp.set_status(200);
                     }else if (servSock[n].second.getLocation(rqst.get_file()+"/"))
@@ -258,7 +278,8 @@ void ServSock::processConnection(int n){
                     }
                     
             }
-            buildResponse(n, rsp, rqst);
+            if (!autIndexed)
+                buildResponse(n, rsp, rqst);
             sendResponse(n, rsp);
             servSock[n].first.close_sock();
             servSock.erase(servSock.begin() + n); 

@@ -45,7 +45,12 @@ public:
     std::string getIndex();
     std::string getRoot();
     std::string getErrorPath();
+    bool getAutoIndex();
 };
+
+bool Server::getAutoIndex(){
+    return _isAutoIndex;
+}
 
 std::string Server::getErrorPath(){
     if (_error_path.back() == '/')
@@ -102,9 +107,8 @@ int Server::checkServ(){
             f = 1;
         }
     }
-    if (!f && _index.empty())
+    if (!f && _index.empty() && !_isAutoIndex)
     {
-        // std::cout << _index << ". = " << f << std::endl;
         std::cout << "server doesn' t have root location" << std::endl;
         return -1;
     }
@@ -246,6 +250,10 @@ int Server::setAutoIndex(std::string *s, int& size){
     }
     if (!strncmp("on", s[1].c_str(), 2))
         _isAutoIndex = true;
+    else if (!strncmp("off", s[1].c_str(), 3))
+        _isAutoIndex = false;
+    std::cout << ">>>>>>>" << _isAutoIndex << std::endl;
+    
     return 0;
 }
 

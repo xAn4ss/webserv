@@ -200,7 +200,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
                 return 1;
             i++;
         }
-        else if (!strncmp("autoindex", (*i).c_str(), 9)){
+        else if (!strncmp("autoIndex", (*i).c_str(), 9)){
             if (serv.setAutoIndex(splitIt(*i, s), s))
             return 1;
             i++;
