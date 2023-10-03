@@ -38,19 +38,19 @@ void ServSock::sendResponse(int n, Response rsp){
     if (chunked){
         std::string tp;
         int x = chunkedData.size();
-        send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
+        send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), MSG_NOSIGNAL);
         std::cout << "§§" << rsp.get_request() << std::endl;
         while (!(tp = fct(file, x)).empty())
         {
-            send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+            send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), MSG_NOSIGNAL);
             std::cout << "§§" << tp << std::endl;    
             if (tp == "0\r\n\r\n"){
-                send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
+                send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), MSG_NOSIGNAL);
                 std::cout << "§§" << tp << std::endl;    
                 break;
             }
         }
-    }else if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), 0) == -1){
+    }else if (send(servSock[n].first.get_socket(), rsp.get_request().c_str(), strlen(rsp.get_request().c_str()), MSG_NOSIGNAL) == -1){
     std::cout << "error" << std::endl;
     exit(0);
     /*****************/

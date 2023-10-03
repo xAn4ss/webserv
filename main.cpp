@@ -128,6 +128,12 @@ int Webserv::startSockets(){
                     new_sock.setSocket(accept(servSock[i].first.get_socket(), (struct sockaddr*)&soc_address, &addr_len));
                     std::cout << "new sock : " << servSock[i].first.get_socket() << std::endl;
                     // std::cout << "sock : " << soc[i].get_socket() << std::endl;
+                    // int p = 1;
+                    // if (setsockopt(new_sock.get_socket(), SOL_SOCKET, SO_NOSIGPIPE, &p, sizeof(p)) == -1)
+                    // {
+                    //     perror("setsock:");
+                    //     exit(0);
+                    // }
                     servSock.addPair(std::make_pair(new_sock, servSock[i].second));
                     max_fd = std::max(max_fd, new_sock.get_socket());
                 }else{
