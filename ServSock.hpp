@@ -214,24 +214,30 @@ void ServSock::processConnection(int n){
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()))
                     {    // when u give a folder path u get index to that location/folder
-                        if (servSock[n].second.getAutoIndex())
+                        ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
+                        if (tmp->getLocationAutoIndex() && tmp->getLocationIndex().empty())
                         {
                             autIndexed = 1;
                             std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
                             response += "<html><head><title>Index of ";
                             response += "auto index test";
                             response += "</title></head><body><h1>Index of ";
-                            response += "AutoIndex Test";
+                            response += tmp->getLocationPath();
                             response += "</h1><ul>";
-                            response += "<li><a href=\"";
-                            response += "test/test.html";
-                            response += "\">";
-                            response += "Testing ...";
-                            response += "</a></li>";
+                            struct dirent *dir;
+                            DIR *d = opendir(tmp->getLocationRoot().c_str());
+                            while ((dir = readdir(d)) != NULL)
+                            {
+                                response += "<li><a href=\"";
+                                response += "../" + tmp->getLocationRoot() + dir->d_name;
+                                response += "\">";
+                                response += dir->d_name;
+                                response += "</a></li>";
+                                std::cout << ">>>>>>>" << dir->d_name <<std::endl;                                
+                            }
                             response += "</ul></body></html>";
                             rsp + response;
                         }
-                            std::cout << ">>>>>>>" << rsp.get_request() <<std::endl;
 
                         file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
                         rsp.set_status(200);
@@ -275,7 +281,7 @@ void ServSock::processConnection(int n){
                             rsp.set_status(200);
                         }else
                             rsp.set_status(404);
-                    }
+                     }
                     
             }
             if (!autIndexed)

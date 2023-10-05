@@ -160,6 +160,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
 
     while (i != conf.end())
     {
+
         s = 0;
         if (!strncmp((*i).c_str(), "#", 1))
             i++;
@@ -219,6 +220,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             i++;
             //push servLocation in location vector
             serv.addLocation(location);
+
         }
         else if (strncmp((*i).c_str(), "}", 1))
         {
@@ -282,6 +284,10 @@ int Config::parse_config()
             {
                 std::cout << "location path: "  << (*tmp)[i].getLocationPath() << std::endl;
                 std::cout << "location index: "  << (*tmp)[i].getLocationIndex() << std::endl;
+                if ((*tmp)[i].getLocationAutoIndex()){
+                    std::cout << "location autoIndex On." << std::endl;
+                }
+
             }
         }
         std::cout << "========= Server : "<< i+1 << " done. ==========" << std::endl;

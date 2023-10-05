@@ -27,37 +27,42 @@ public:
     int setLocationRoot(std::string* s, int& size);
     int setLocationIndex(std::string* s, int& size);
     int setLocationPath(std::string s);
+    int setLocationAutoIndex(std::string *s, int& size);
     int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
     std::string getLocationRoot();
     std::string getLocationPath();
     std::string getLocationIndex();
+    bool getLocationAutoIndex();
     // int parse
 };
 
 ServLocation::ServLocation(){
     _index = "";
+    _isAutoIndex = false;
 }
 
 ServLocation::~ServLocation()
 {
 }
 
-
+bool ServLocation::getLocationAutoIndex()
+{
+    return _isAutoIndex;
+}
 
 std::string ServLocation::getLocationIndex(){
     if (this == nullptr)
         return "inexistant location.";
     
     if(_index.empty())
-        return "emptyy";
+        return "";
     return _index;
 }
 
 std::string ServLocation::getLocationPath(){
-        // std::cout << _locationPath << std::endl;
     if (_locationPath.empty())
     {
-        return "empty"; 
+        return "empty";
     }
     return _locationPath;
 }
@@ -116,8 +121,24 @@ int ServLocation::setLocationRoot(std::string* s, int& size){
     return 0;
 }
 
+int ServLocation::setLocationAutoIndex(std::string *s, int& size){
+    if (size != 2)
+    {
+        std::cout << "error in Location autoIndex directive." << std::endl;
+        return 1;
+    }
+    if (!strncmp("on", s[1].c_str(), 2))
+        _isAutoIndex = true;
+    else if (!strncmp("off", s[1].c_str(), 3))
+        _isAutoIndex = false;
+    std::cout << "begin: " << _isAutoIndex << std::endl;
+    
+    return 0;
+}
+
 int ServLocation::setLocationPath(std::string s)
 {
+        std::cout << "------" << std::endl;
     if (!opendir(s.c_str()))
     {
         std::cout << "error in location path" << std::endl;
@@ -143,6 +164,7 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
         begin++;
     while (begin != end)
     {
+
         size = 0;
         if (!strncmp((*begin).c_str(), "root", 4))
         {
@@ -152,6 +174,10 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
         else if (!strncmp((*begin).c_str(), "index", 5))
         {
             if (setLocationIndex(splitIt((*begin).c_str(), size), size))
+                return 1;
+        }else if (!strncmp((*begin).c_str(), "autoIndex", 9))
+        {
+            if (setLocationAutoIndex(splitIt((*begin).c_str(), size), size))
                 return 1;
         }
         // std::cout << *begin << std::endl;
