@@ -145,12 +145,12 @@ void ServSock::buildResponse(int n, Response& rsp, Request rqst){
     if (rsp.get_status() == 301)
         return;
     if ((file.length() - file.find(".css")) == 4)
-        rsp + "Content-Type: text/css\n";
-    else if((file.length() - file.find(".html")) == 5)
-        rsp + "Content-Type: text/html\n";
-    else if ((file.length() - file.find(".jpeg")) == 5){
-        chunked = 1;
-        rsp + "Content-Type: image/jpeg\r\n";
+		rsp + "Content-Type: text/css\n";
+	else if((file.length() - file.find(".html")) == 5)
+		rsp + "Content-Type: text/html\n";
+	else if ((file.length() - file.find(".jpeg")) == 5){
+		chunked = 1;
+		rsp + "Content-Type: image/jpeg\r\n";
         setContentLength(rsp, chunkedData, file);
     }
     else if ((file.length() - file.find(".png")) == 4)
@@ -202,12 +202,17 @@ void ServSock::processConnection(int n){
                 if (S_ISDIR(slatt.st_mode))
                 {
                     std::cout << "dir "<< std::endl;
-                    if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
+                    if (servSock[n].second.getLocation(rqst.get_file()+"/"))
+                    {
+                        file = rqst.get_file() + "/";
+                        rsp.set_status(301);
+                    }
+                    else if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
                         && !servSock[n].second.getIndex().empty()){
                             struct stat t;
                             if (rqst.get_file().compare("/")){
                                 rsp.set_status(403);
-                                std::cout << " ===========  "<< std::endl;
+                                std::cout << " ======*====  "<< std::endl;
                             }
                             else
                                 file = servSock[n].second.getIndex();
@@ -241,10 +246,6 @@ void ServSock::processConnection(int n){
 
                         file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
                         rsp.set_status(200);
-                    }else if (servSock[n].second.getLocation(rqst.get_file()+"/"))
-                    {
-                        file = rqst.get_file() + "/";
-                        rsp.set_status(301);
                     }else
                         rsp.set_status(403);
                 }else{
