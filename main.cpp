@@ -8,8 +8,8 @@
 class Webserv{
 private:
     std::vector<Socket> soc;
-    Config config;
 public:
+    Config config;
     Webserv(std::string s);
     ~Webserv();
     int startParsing();
@@ -44,10 +44,8 @@ int Webserv::startSockets(){
 
         int x = 1;
         Socket sock;
-        //  << " <<<<<<i" << std::endl;
 
         for (int n = 0; n < ((*config.getServers())[i].getPorts()).size(); n++){
-            // ((*config.getServers())[i].getPorts())[i]
             tmp_fd.push_back(socket(AF_INET, SOCK_STREAM, 0));
             sock.setSocket(tmp_fd.back());
             if (sock.get_socket() < 0)
@@ -59,7 +57,6 @@ int Webserv::startSockets(){
             sock_addr.sin_family = AF_INET;
             sock_addr.sin_port = htons((*config.getServers())[i].getPorts()[n]);
             sock_addr.sin_addr.s_addr = INADDR_ANY;
-            // std::cout << ">>>>>> " << (*config.getServers())[i].getPorts()[n] << " <<<<<<" << std::endl;
             if (setsockopt(sock.get_socket(), SOL_SOCKET, SO_REUSEADDR, &x, sizeof(x)) == -1){
                 perror("sockopt");
                 return -1;
@@ -82,31 +79,30 @@ int Webserv::startSockets(){
         }
         i++;
     }
-    // std::vector<std::pair<Socket, Server>> servSock;
-    for (std::vector<Socket>::iterator sok = soc.begin(); sok != soc.end();){
-        for (std::vector<Server>::iterator srv = (*config.getServers()).begin(); srv != (*config.getServers()).end(); srv++){
-            for (int i = 0; i < (*srv).getPorts().size() ; i++)
-            {
-                std::cout << "socket : "<< (*sok).get_socket() << std::endl;
-                std::cout << "host : "<< (*srv).getPorts()[i] << std::endl;
-                servSock.addPair(std::make_pair((*sok), (*srv)));
-                sok++;
-            }
-        }
-    }
-    for (int i = 0; i < servSock.size(); i++)
-    {
-        std::cout << servSock[i].first.get_socket() << std::endl;
-        for (int y = 0; y < servSock[i].second.getPorts().size() ; y++ ){
-            std::cout << servSock[i].second.getPorts()[y] << std::endl;
-            std::cout << servSock[i].second.gethost() << std::endl;
-        }
-    }
-    std::cout << "sockets size : "<< soc.size() << std::endl;
-    for (std::vector<Socket>::iterator it = soc.begin(); it != soc.end(); it++)
-    {
-        std::cout << (*it).get_socket() << std::endl;
-    }
+    // for (std::vector<Socket>::iterator sok = soc.begin(); sok != soc.end();){
+    //     for (std::vector<Server>::iterator srv = (*config.getServers()).begin(); srv != (*config.getServers()).end(); srv++){
+    //         for (int i = 0; i < (*srv).getPorts().size() ; i++)
+    //         {
+    //             std::cout << "socket : "<< (*sok).get_socket() << std::endl;
+    //             std::cout << "host : "<< (*srv).getPorts()[i] << std::endl;
+    //             servSock.addPair(std::make_pair((*sok), (*srv)));
+    //             sok++;
+    //         }
+    //     }
+    // }
+    // for (int i = 0; i < servSock.size(); i++)
+    // {
+    //     std::cout << servSock[i].first.get_socket() << std::endl;
+    //     for (int y = 0; y < servSock[i].second.getPorts().size() ; y++ ){
+    //         std::cout << servSock[i].second.getPorts()[y] << std::endl;
+    //         std::cout << servSock[i].second.gethost() << std::endl;
+    //     }
+    // }
+    // std::cout << "sockets size : "<< soc.size() << std::endl;
+    // for (std::vector<Socket>::iterator it = soc.begin(); it != soc.end(); it++)
+    // {
+    //     std::cout << (*it).get_socket() << std::endl;
+    // }
     while (true) {
         FD_ZERO(&port_fd);
         for (int i = 0; i < servSock.size(); i++){
@@ -127,13 +123,6 @@ int Webserv::startSockets(){
                     Socket new_sock;
                     new_sock.setSocket(accept(servSock[i].first.get_socket(), (struct sockaddr*)&soc_address, &addr_len));
                     std::cout << "new sock : " << servSock[i].first.get_socket() << std::endl;
-                    // std::cout << "sock : " << soc[i].get_socket() << std::endl;
-                    // int p = 1;
-                    // if (setsockopt(new_sock.get_socket(), SOL_SOCKET, SO_NOSIGPIPE, &p, sizeof(p)) == -1)
-                    // {
-                    //     perror("setsock:");
-                    //     exit(0);
-                    // }
                     servSock.addPair(std::make_pair(new_sock, servSock[i].second));
                     max_fd = std::max(max_fd, new_sock.get_socket());
                 }else{
@@ -147,9 +136,7 @@ int Webserv::startSockets(){
                     }else if (rcv > 0){
                         buf[rcv] = '\0';
                         servSock[i].first.set_request(buf);
-                        // soc[i].set_request(buf);
                         std::cout << servSock[i].first.get_request() << std::endl;
-                        // servSock[i].first.handleRequest();
                         servSock.processConnection(i);
                     }else{
                         std::cout << "~~Disconnected~~" << std::endl;
@@ -159,20 +146,13 @@ int Webserv::startSockets(){
                 }
             }
         } 
-        std::cout << "~~~~ ~~~~" << std::endl;
+        std::cout << "==== ==== ==== ===== =====" << std::endl;
     }
-        // std::cout << sock.get_request() << std::endl;
     return 0;
 }
 
 Webserv::Webserv(std::string s){
     config.setConfigFileName(s);
-}
-
-int Webserv::startParsing(){
-    if (config.parse_config() < 0)
-        return -1;
-    return 0;
 }
 
 Webserv::~Webserv(){
@@ -189,23 +169,12 @@ int main(int ac, char **av)
         return 0;
     }
     Webserv run(av[1]);
-    if (run.startParsing() < 0)
+    if (run.config.parse_config() < 0)
     {
         std::cout << "Something is wrong in conf file" << std::endl;
         return 0;
     }
     run.startSockets();
-    // if (soc.create_socket() < 0)
-    //     return 0;
-    // std::cout << "-> " << soc.get_request() << "." << std::endl;
-    // Request request;
-    // request.parse(soc.get_request());
-    // std::cout << "{" << request.get_method() << "}" << std::endl;
-    // std::cout << "{" << request.get_file() << "}" << std::endl;
 
-    // Response response;
-    // // response.
-    // response.set_status(200);
-    // config.
     soc.close_sock();
 }
