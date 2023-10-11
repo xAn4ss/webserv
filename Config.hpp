@@ -139,10 +139,8 @@ int Config::confParse(){
         }
         if (!hash_f)
         {
-            // std::cout << *(it + b) << " ==> " << *(it + c) << "." <<  std::endl;
             std::vector<std::string>::iterator bgin = it +b;
             std::vector<std::string>::iterator end = it +c;
-            // std::cout <<"begin: "<< *bgin << " end: " << *end << std::endl;
             if (parse_server(bgin, end))
                 return -1;
         }

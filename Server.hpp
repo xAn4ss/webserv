@@ -100,21 +100,15 @@ int Server::checkServ(){
     int f = 0;
     for (int i = 0; i < _location.size(); i++)
     {
-        std::cout << ".." << _location[i].getLocationPath() << std::endl;
         if (!strncmp("/" ,_location[i].getLocationPath().c_str() , 1))
-        {
-            std::cout << "=> " << f << std::endl;
             f = 1;
-        }
-        std::cout << "=> " << _location[i].getLocationAutoIndex() << std::endl;
-        std::cout << "=> " << _location[i].getLocationIndex().empty() << std::endl;
         if (_location[i].getLocationAutoIndex() == true && _location[i].getLocationRoot().empty() == true)
         {
             std::cout << " AutoIndex On and index not empty. "<< std::endl;
             return -1;
         }
     }
-    if (!f && _index.empty())
+    if (!f && _index.empty() && _isAutoIndex == false)
     {
         std::cout << "server doesn' t have root location" << std::endl;
         return -1;

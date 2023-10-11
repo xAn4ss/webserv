@@ -131,14 +131,11 @@ int ServLocation::setLocationAutoIndex(std::string *s, int& size){
         _isAutoIndex = true;
     else if (!strncmp("off", s[1].c_str(), 3))
         _isAutoIndex = false;
-    std::cout << "begin: " << _isAutoIndex << std::endl;
-    
     return 0;
 }
 
 int ServLocation::setLocationPath(std::string s)
 {
-        std::cout << "------" << std::endl;
     if (!opendir(s.c_str()))
     {
         std::cout << "error in location path" << std::endl;

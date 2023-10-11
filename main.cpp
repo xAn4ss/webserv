@@ -38,13 +38,8 @@ int Webserv::startSockets(){
     ServSock servSock;
     while (i < (*config.getServers()).size())    
     {
-        std::cout << "Server "<< i + 1<<":\nHost: " << (*config.getServers())[i].gethost() << std::endl;
-        std::cout << "Ports are: ";
-        (*config.getServers())[i].printPorts();
-
         int x = 1;
         Socket sock;
-
         for (int n = 0; n < ((*config.getServers())[i].getPorts()).size(); n++){
             tmp_fd.push_back(socket(AF_INET, SOCK_STREAM, 0));
             sock.setSocket(tmp_fd.back());
@@ -79,30 +74,6 @@ int Webserv::startSockets(){
         }
         i++;
     }
-    // for (std::vector<Socket>::iterator sok = soc.begin(); sok != soc.end();){
-    //     for (std::vector<Server>::iterator srv = (*config.getServers()).begin(); srv != (*config.getServers()).end(); srv++){
-    //         for (int i = 0; i < (*srv).getPorts().size() ; i++)
-    //         {
-    //             std::cout << "socket : "<< (*sok).get_socket() << std::endl;
-    //             std::cout << "host : "<< (*srv).getPorts()[i] << std::endl;
-    //             servSock.addPair(std::make_pair((*sok), (*srv)));
-    //             sok++;
-    //         }
-    //     }
-    // }
-    // for (int i = 0; i < servSock.size(); i++)
-    // {
-    //     std::cout << servSock[i].first.get_socket() << std::endl;
-    //     for (int y = 0; y < servSock[i].second.getPorts().size() ; y++ ){
-    //         std::cout << servSock[i].second.getPorts()[y] << std::endl;
-    //         std::cout << servSock[i].second.gethost() << std::endl;
-    //     }
-    // }
-    // std::cout << "sockets size : "<< soc.size() << std::endl;
-    // for (std::vector<Socket>::iterator it = soc.begin(); it != soc.end(); it++)
-    // {
-    //     std::cout << (*it).get_socket() << std::endl;
-    // }
     while (true) {
         FD_ZERO(&port_fd);
         for (int i = 0; i < servSock.size(); i++){
