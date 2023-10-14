@@ -21,12 +21,14 @@ private:
     std::vector<int>            _error_code;
     std::string                 _error_path;
     std::vector<std::string>    _server_name;
+    std::map<std::string, int>  _methods;
     // std::map<std::string, std::string> root_index;
 
 
 public:
     Server(/* args */);
     ~Server();
+    int setMethods(std::string *s, int& size);
     int setPort(std::string *s, int& size);
     int setHost(std::string *host, int &size);
     int setRoot(std::string *root, int& size);
@@ -125,6 +127,9 @@ std::vector<ServLocation>* Server::getLocations(){
 
 Server::Server(/* args */)
 {
+    _methods.insert(std::make_pair("GET", 1));
+    _methods.insert(std::make_pair("POST", 1));
+    _methods.insert(std::make_pair("DELETE", 1));
     _isAutoIndex = false;
     _index = "";
 }
@@ -173,6 +178,42 @@ int Server::setHost(std::string* host, int &size){
         return 1;
     }
     this->_host = host[1];
+    return 0;
+}
+
+int Server::setMethods(std::string *method, int &size){
+    if (size < 2){
+        std::cout << "Error in method directive" << std::endl;
+        return 1;
+    }
+    std::map<std::string, int>::iterator it = _methods.begin();
+    while (it != _methods.end()){
+            int f = 0;
+        for (int i = 1; i < size; i++){
+            if (method[i].compare("GET") && method[i].compare("POST") 
+             && method[i].compare("DELETE")){
+                std::cout << "Error in methods syntax." << std::endl;
+                return 1;
+            }
+            std::cout << it->first<< "("<< method[i] << ")";
+            if (it->first == method[i])
+            {
+                f = 1;
+                it->second++;
+            }
+            else if (!f && it->first != method[i])
+            {
+                it->second = 0;
+
+            }
+            std::cout << it->second << std::endl;
+        }
+        it++;
+    }
+    std::cout << "Methods are :"<< std::endl;
+    std::cout << "GET : "<< _methods["GET"]<< std::endl;
+    std::cout << "POST : "<< _methods["POST"]<< std::endl;
+    std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
     return 0;
 }
 

@@ -21,6 +21,7 @@ private:
     bool                        _isAutoIndex;
     std::string                 _return;
     std::string                 _client_max_body_size;
+    std::map<std::string, int>  _methods;
 public:
     ServLocation(/* args */);
     ~ServLocation();
@@ -39,6 +40,10 @@ public:
 ServLocation::ServLocation(){
     _index = "";
     _isAutoIndex = false;
+    _methods.insert(std::make_pair("GET", 1));
+    _methods.insert(std::make_pair("POST", 1));
+    _methods.insert(std::make_pair("DELETE", 1));
+
 }
 
 ServLocation::~ServLocation()
