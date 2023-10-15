@@ -28,10 +28,12 @@ public:
     int setLocationRoot(std::string* s, int& size);
     int setLocationIndex(std::string* s, int& size);
     int setLocationPath(std::string s);
+    int setLocationMethods(std::string *method, int &size);
     int setLocationAutoIndex(std::string *s, int& size);
     int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
     std::string getLocationRoot();
     std::string getLocationPath();
+    std::map<std::string, int> getLocationMethods();
     std::string getLocationIndex();
     bool getLocationAutoIndex();
     // int parse
@@ -46,9 +48,51 @@ ServLocation::ServLocation(){
 
 }
 
+int ServLocation::setLocationMethods(std::string *method, int &size){
+    if (size < 2){
+        std::cout << "Error in method directive" << std::endl;
+        return 1;
+    }
+    std::map<std::string, int>::iterator it = _methods.begin();
+    while (it != _methods.end()){
+            int f = 0;
+        for (int i = 1; i < size; i++){
+            if (method[i].compare("GET") && method[i].compare("POST") 
+             && method[i].compare("DELETE")){
+                std::cout << "Error in methods syntax." << std::endl;
+                return 1;
+            }
+            std::cout << it->first<< "("<< method[i] << ")";
+            if (it->first == method[i])
+            {
+                f = 1;
+                it->second++;
+            }
+            else if (!f && it->first != method[i])
+            {
+                it->second = 0;
+
+            }
+            std::cout << it->second << std::endl;
+        }
+        it++;
+    }
+    std::cout << "Methods are :"<< std::endl;
+    std::cout << "GET : "<< _methods["GET"]<< std::endl;
+    std::cout << "POST : "<< _methods["POST"]<< std::endl;
+    std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
+    return 0;
+}
+
 ServLocation::~ServLocation()
 {
 }
+
+
+std::map<std::string, int> ServLocation::getLocationMethods(){
+    return _methods;
+}
+
 
 bool ServLocation::getLocationAutoIndex()
 {
@@ -180,6 +224,11 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
         }else if (!strncmp((*begin).c_str(), "autoIndex", 9))
         {
             if (setLocationAutoIndex(splitIt((*begin).c_str(), size), size))
+                return 1;
+        }
+        else if (!strncmp((*begin).c_str(), "method",6))
+        {
+            if (setLocationMethods(splitIt((*begin).c_str(), size), size))
                 return 1;
         }
         // std::cout << *begin << std::endl;

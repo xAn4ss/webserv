@@ -201,7 +201,12 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
         }
         else if (!strncmp("autoIndex", (*i).c_str(), 9)){
             if (serv.setAutoIndex(splitIt(*i, s), s))
-            return 1;
+                return 1;
+            i++;
+        }
+        else if(!strncmp("method", (*i).c_str(), 6)){
+            if (serv.setMethods(splitIt(*i, s), s))
+                return 1;
             i++;
         }
         else if (!strncmp((*i).c_str(), "location", 8) &&
@@ -219,11 +224,6 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             //push servLocation in location vector
             serv.addLocation(location);
 
-        }
-        else if(!strncmp("method", (*i).c_str(), 6)){
-            if (serv.setMethods(splitIt(*i, s), s))
-                return 1;
-            i++;
         }
         else if (strncmp((*i).c_str(), "}", 1))
         {

@@ -47,11 +47,16 @@ public:
     std::string getIndex();
     std::string getRoot();
     std::string getErrorPath();
+    std::map<std::string, int> getMethods();
     bool getAutoIndex();
 };
 
 bool Server::getAutoIndex(){
     return _isAutoIndex;
+}
+
+std::map<std::string, int> Server::getMethods(){
+    return _methods;
 }
 
 std::string Server::getErrorPath(){

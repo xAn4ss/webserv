@@ -122,6 +122,9 @@ void ServSock::buildHead(int n, Response& rsp, Request rqst){
         }else if (rsp.get_status() == 403){
             file += std::to_string(rsp.get_status()) + ".html";
             rsp + " Forbidden";
+        }else if (rsp.get_status() == 501){
+            file += std::to_string(rsp.get_status()) + ".html";
+            rsp + " Not Implemented";
         }else//check for other error codes
             rsp + " undefined";
         rsp + "\r\n";
@@ -215,7 +218,12 @@ void ServSock::processConnection(int n){
                                 std::cout << " ======*====  "<< std::endl;
                             }
                             else
-                                file = servSock[n].second.getIndex();
+                            {
+                                if (servSock[n].second.getMethods()["GET"] > 0)
+                                    file = servSock[n].second.getIndex();
+                                else
+                                    rsp.set_status(501);
+                            }
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()))
                     {    // when u give a folder path u get index to that location/folder
@@ -243,9 +251,12 @@ void ServSock::processConnection(int n){
                             response += "</ul></body></html>";
                             rsp + response;
                         }
-
-                        file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
-                        rsp.set_status(200);
+                        if ((*servSock[n].second.getLocation(rqst.get_file())).getLocationMethods()["GET"] > 0)
+                        {
+                            file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
+                            rsp.set_status(200);
+                        }else
+                            rsp.set_status(501);
                     }else
                         rsp.set_status(403);
                 }else{

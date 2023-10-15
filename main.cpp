@@ -56,6 +56,10 @@ int Webserv::startSockets(){
                 perror("sockopt");
                 return -1;
             }
+            // if (setsockopt(sock.get_socket(), SOL_SOCKET, SO_REUSEPORT, &x, sizeof(x)) == -1){
+            //     perror("sockopt");
+            //     return -1;
+            // }
             int bnd = bind(sock.get_socket(), (struct sockaddr *)&sock_addr, sizeof(sock_addr));
             if (bnd < 0)
             {
@@ -73,6 +77,15 @@ int Webserv::startSockets(){
             max_fd = std::max(max_fd, sock.get_socket());    
         }
         i++;
+    }
+    for (std::vector<Socket>::iterator sok = soc.begin(); sok != soc.end();){
+        for (std::vector<Server>::iterator srv = (*config.getServers()).begin(); srv != (*config.getServers()).end(); srv++){
+            for (int i = 0; i < (*srv).getPorts().size() ; i++)
+            {
+                servSock.addPair(std::make_pair((*sok), (*srv)));
+                sok++;
+            }
+        }
     }
     while (true) {
         FD_ZERO(&port_fd);
@@ -117,7 +130,6 @@ int Webserv::startSockets(){
                 }
             }
         } 
-        std::cout << "==== ==== ==== ===== =====" << std::endl;
     }
     return 0;
 }
@@ -145,6 +157,7 @@ int main(int ac, char **av)
         std::cout << "Something is wrong in conf file" << std::endl;
         return 0;
     }
+    
     run.startSockets();
 
     soc.close_sock();
