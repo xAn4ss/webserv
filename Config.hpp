@@ -72,7 +72,7 @@ void getRidOfTabs(std::vector<std::string> &s){
             if (s[i].find_first_not_of("\t ") != -1 )
             {
                 tmp = s[i].substr(s[i].find_first_not_of("\t "));
-                if (s[i].front() = '\t')
+                if (s[i].front() == '\t')
                     s[i].swap(tmp);
             }
             else
@@ -116,7 +116,7 @@ int Config::confParse(){
         int hash_f = 0;
         if ((*(it + i)).front() == '#')
             hash_f = -1;
-        if (!hash_f && (!strncmp(configVec[i].c_str(), "server", 6) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{') || configVec[i].front() == '#'))
+        if (!hash_f && (!strncmp(configVec[i].c_str(), "server", 6)) && ((!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{') || configVec[i].front() == '#'))
         {
             hash_f = 0;    
             if(configVec[i+1].back() == '{')
