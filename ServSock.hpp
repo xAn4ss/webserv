@@ -264,10 +264,12 @@ void ServSock::processConnection(int n){
                     std::string path;
                     if (!access(rqst.get_file().c_str(), F_OK))
                     { // if path requested exists file = path
-                        std::cout << rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1) << std::endl;
-                        // if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
+                        std::cout << "=> " << rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1) << std::endl;
+                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))->getLocationMethods()["GET"] > 0){
                             file = rqst.get_file();
                             rsp.set_status(200);
+                        }else
+                            rsp.set_status(501);
                     }
                 }
             }else{
