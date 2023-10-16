@@ -39,14 +39,14 @@ void ServSock::sendResponse(int n, Response rsp){
         std::string tp;
         int x = chunkedData.size();
         send(servSock[n].first.get_socket(), rsp.get_request().c_str(), rsp.get_request().size(), 0);
-        std::cout << "§§" << rsp.get_request() << std::endl;
+        // std::cout << "§§" << rsp.get_request() << std::endl;
         while (!(tp = fct(file, x)).empty())
         {
             send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
-            std::cout << "§§" << tp << std::endl;    
+            // std::cout << "§§" << tp << std::endl;
             if (tp == "0\r\n\r\n"){
                 send(servSock[n].first.get_socket(), tp.c_str(), tp.size(), 0);
-                std::cout << "§§" << tp << std::endl;    
+                // std::cout << "§§" << tp << std::endl;    
                 break;
             }
         }
@@ -55,7 +55,7 @@ void ServSock::sendResponse(int n, Response rsp){
     exit(0);
     /*****************/
     }
-    std::cout << "§§" << rsp.get_request() << std::endl;
+    // std::cout << "§§" << rsp.get_request() << std::endl;
 
 }
 
@@ -181,6 +181,28 @@ void ServSock::buildResponse(int n, Response& rsp, Request rqst){
     }
 }
 
+std::string buildAutoIndex(std::string path){
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+    response += "<html><head><title>Index of ";
+    response += "auto index test";
+    response += "</title></head><body><h1>Index of ";
+    response += path;
+    response += "</h1><ul>";
+    struct dirent *dir;
+    DIR *d = opendir(path.c_str());
+    while ((dir = readdir(d)) != NULL)
+    {
+        response += "<li><a href=\"";
+        response += "../" + path + dir->d_name;
+        response += "\">";
+        response += dir->d_name;
+        response += "</a></li>";
+        std::cout << ">>>>>>>" << dir->d_name <<std::endl;                                
+    }
+    response += "</ul></body></html>";
+    return response;
+}
+
 void ServSock::processConnection(int n){
     Request     rqst;
     Response    rsp;
@@ -211,18 +233,28 @@ void ServSock::processConnection(int n){
                         rsp.set_status(301);
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
-                        && !servSock[n].second.getIndex().empty()){
+                        ){
                             struct stat t;
                             if (rqst.get_file().compare("/")){
                                 rsp.set_status(403);
-                                std::cout << " ======*====  "<< std::endl;
                             }
                             else
                             {
-                                if (servSock[n].second.getMethods()["GET"] > 0)
-                                    file = servSock[n].second.getIndex();
-                                else
-                                    rsp.set_status(501);
+                                if (servSock[n].second.getAutoIndex() == true
+                                     && servSock[n].second.getIndex().empty()){
+                                        std::cout << " ======*====  "<< std::endl;
+                                        autIndexed = 1;
+                                        rsp + buildAutoIndex(servSock[n].second.getRoot());
+                                }else{
+                                
+                                    if (servSock[n].second.getMethods()["GET"] > 0)
+                                    {
+                                        file = servSock[n].second.getIndex();
+                                        rsp.set_status(200);
+                                    }
+                                    else
+                                        rsp.set_status(501);
+                                }
                             }
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()))
@@ -231,25 +263,7 @@ void ServSock::processConnection(int n){
                         if (tmp->getLocationAutoIndex() && tmp->getLocationIndex().empty())
                         {
                             autIndexed = 1;
-                            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-                            response += "<html><head><title>Index of ";
-                            response += "auto index test";
-                            response += "</title></head><body><h1>Index of ";
-                            response += tmp->getLocationPath();
-                            response += "</h1><ul>";
-                            struct dirent *dir;
-                            DIR *d = opendir(tmp->getLocationRoot().c_str());
-                            while ((dir = readdir(d)) != NULL)
-                            {
-                                response += "<li><a href=\"";
-                                response += "../" + tmp->getLocationRoot() + dir->d_name;
-                                response += "\">";
-                                response += dir->d_name;
-                                response += "</a></li>";
-                                std::cout << ">>>>>>>" << dir->d_name <<std::endl;                                
-                            }
-                            response += "</ul></body></html>";
-                            rsp + response;
+                            rsp + buildAutoIndex(tmp->getLocationRoot());
                         }
                         if ((*servSock[n].second.getLocation(rqst.get_file())).getLocationMethods()["GET"] > 0)
                         {
@@ -265,11 +279,19 @@ void ServSock::processConnection(int n){
                     if (!access(rqst.get_file().c_str(), F_OK))
                     { // if path requested exists file = path
                         std::cout << "=> " << rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1) << std::endl;
-                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))->getLocationMethods()["GET"] > 0){
+                        if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))){
+                                if (servSock[n].second.getLocation(rqst.get_file().substr(0, rqst.get_file().find_last_of("/")+1))->getLocationMethods()["GET"] > 0){
+                                    file = rqst.get_file();
+                                    rsp.set_status(200);
+                                }
+                                else
+                                    rsp.set_status(501);
+                        }else if (servSock[n].second.getMethods()["GET"] < 1)
+                            rsp.set_status(501);
+                        else{
                             file = rqst.get_file();
                             rsp.set_status(200);
-                        }else
-                            rsp.set_status(501);
+                        }
                     }
                 }
             }else{
