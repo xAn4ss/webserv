@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "methods/Handler.hpp"
+
+
 class ServSock
 {
 private:
@@ -325,6 +328,9 @@ void ServSock::processConnection(int n){
             sendResponse(n, rsp);
             servSock[n].first.close_sock();
             servSock.erase(servSock.begin() + n); 
+    }else {
+        Handler handler(rqst);
+        handler.handleMethod();
     }
 }
 
