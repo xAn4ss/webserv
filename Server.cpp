@@ -1,55 +1,4 @@
-#ifndef SERVER_HPP
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sys/types.h>
-#include <map>
-#include <algorithm>
-#include <dirent.h>
-#include "ServLocation.hpp"
-
-class Server
-{
-private:
-    std::vector<ServLocation>  _location;
-    bool                        _isAutoIndex;
-    std::string                 _host;
-    std::string                 _root;
-    std::string                 _index;
-    std::vector<int>            _port;
-    std::vector<int>            _error_code;
-    std::string                 _error_path;
-    std::vector<std::string>    _server_name;
-    std::map<std::string, int>  _methods;
-    // std::map<std::string, std::string> root_index;
-
-
-public:
-    Server(/* args */);
-    ~Server();
-    int setMethods(std::string *s, int& size);
-    int setPort(std::string *s, int& size);
-    int setHost(std::string *host, int &size);
-    int setRoot(std::string *root, int& size);
-    int setServerName(std::string *s, int& size);
-    int setError(std::string *s, int& size);
-    int setIndex(std::string *s, int& size);
-    int setAutoIndex(std::string *s, int& size);
-    void addLocation(ServLocation loc);
-    void printPorts();
-    std::vector<ServLocation>* getLocations();
-    ServLocation* getLocation(std::string s);
-
-    std::string gethost();
-    int checkServ();
-    std::vector<int> getPorts();
-    std::string getIndex();
-    std::string getRoot();
-    std::string getErrorPath();
-    std::map<std::string, int> getMethods();
-    bool getAutoIndex();
-};
+#include "Includes/Server.hpp"
 
 bool Server::getAutoIndex(){
     return _isAutoIndex;
@@ -105,7 +54,7 @@ int Server::checkServ(){
         return -1;
     }
     int f = 0;
-    for (int i = 0; i < _location.size(); i++)
+    for (int i = 0; i < (int)_location.size(); i++)
     {
         if (!strncmp("/" ,_location[i].getLocationPath().c_str() , 1))
             f = 1;
@@ -153,14 +102,14 @@ int Server::setError(std::string *s, int& size){
     int i = 1;
     while (i < size - 1)
     {
-        if(s[i].find_first_not_of("0123456789") != -1)
+        if((int)s[i].find_first_not_of("0123456789") != -1)
         {
             std::cout << "error in error codes" << std::endl;
             return 1;
         }
         i++;
     }
-    if (s[i].find_first_of("0123456789") != -1)
+    if ((int)s[i].find_first_of("0123456789") != -1)
     {
         std::cout << "error" << std::endl;
         return 1;
@@ -230,7 +179,7 @@ int Server::setPort(std::string *s, int& size){
     }
     for (int i = 1; i < size; i++)
     {
-        if (s[i].find_first_not_of("1234567890") != -1)
+        if ((int)s[i].find_first_not_of("1234567890") != -1)
         {
             std::cout << "error in ports." << std::endl;
             return 1; 
@@ -326,6 +275,3 @@ std::string Server::gethost(){
 Server::~Server()
 {
 }
-
-
-#endif

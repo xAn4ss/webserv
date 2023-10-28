@@ -1,41 +1,5 @@
-#ifndef SERVSOCK_HPP
-#define SERVSOCK_HPP
-
-#include "Socket.hpp"
-#include "Server.hpp"
-#include <algorithm>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "Includes/ServSock.hpp"
 #include "methods/Handler.hpp"
-
-
-class ServSock
-{
-private:
-    std::vector<std::pair<Socket, Server> > servSock;
-    int i;
-    std::string file;
-    bool chunked;
-    std::string chunkedData;
-public:
-    ServSock(/* args */);
-    ~ServSock();
-    int size();
-    void remove(int);
-    void addPair(std::pair<Socket, Server>);
-    std::pair<Socket, Server>& operator[](int);
-    void processConnection(int);
-    void buildResponse(int, Response&, Request);
-    void handleErrors(int, Response&, Request);
-    std::string fct(std::string file, int& s);
-    void buildHead(int n, Response&, Request);
-    void sendResponse(int, Response);
-};
-
-void ServSock::handleErrors(int n, Response& rsp, Request rqst){
-
-}
 
 void ServSock::sendResponse(int n, Response rsp){
     if (chunked){
@@ -237,7 +201,6 @@ void ServSock::processConnection(int n){
                     }
                     else if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
                         ){
-                            struct stat t;
                             if (rqst.get_file().compare("/")){
                                 rsp.set_status(403);
                             }
@@ -355,7 +318,3 @@ ServSock::~ServSock()
 {
     
 }
-
-
-
-#endif

@@ -1,5 +1,6 @@
 
 #include "./Handler.hpp"
+#include "../Includes/Request.hpp"
 
 Handler::Handler(Request request){
     this->request = request;

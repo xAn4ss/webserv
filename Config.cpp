@@ -1,32 +1,4 @@
-#ifndef CONFIG_HPP
-
-#include <string.h>
-#include <fstream>
-#include <iostream>
-#include <stack>
-#include <fcntl.h>
-#include <unistd.h> 
-#include <vector>
-#include <iterator>
-#include "ServSock.hpp"
-
-class Config
-{
-private:
-    std::string config_file;
-    std::vector<std::string> configVec;
-    std::vector<Server> servers;
-public:
-    Config();
-    ~Config();
-    int parse_config();
-    int check_brackets(char *s);
-    void printConfig();
-    int confParse();
-    void setConfigFileName(std::string s);
-    int parse_server(std::vector<std::string>::iterator &b, std::vector<std::string>::iterator &e);
-    std::vector<Server>* getServers();
-};
+#include "Includes/Config.hpp"
 
 std::vector<Server>* Config::getServers(){
     if (servers.empty())
@@ -68,8 +40,8 @@ void Config::printConfig(){
 void getRidOfTabs(std::vector<std::string> &s){
     std::string tmp;
     std::vector<std::string>::iterator it = s.begin();
-    for (int i = 0; i < s.size(); i++){
-            if (s[i].find_first_not_of("\t ") != -1 )
+    for (int i = 0; i < (int)s.size(); i++){
+            if ((int)s[i].find_first_not_of("\t ") != -1 )
             {
                 tmp = s[i].substr(s[i].find_first_not_of("\t "));
                 if (s[i].front() == '\t')
@@ -79,6 +51,7 @@ void getRidOfTabs(std::vector<std::string> &s){
                 s.erase(it + i);
     }
 }
+
 int Config::confParse(){
     char s[1042];
     int fd;
@@ -109,7 +82,7 @@ int Config::confParse(){
     
     getRidOfTabs(configVec);
     std::vector<std::string>::iterator it = configVec.begin();
-    while (i < configVec.size())
+    while (i < (int)    configVec.size())
     {
         int c = 0;
         b = 0;
@@ -154,7 +127,6 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
     Server serv;
     std::vector<std::string>::iterator i = conf.begin();
     int s;
-    int hashf = 0;
 
     while (i != conf.end())
     {
@@ -276,14 +248,14 @@ int Config::parse_config()
     // printConfig();
     int i = -1;
 
-    while (++i < servers.size())
+    while (++i < (int)servers.size())
     {
         std::cout << "host is " << this->servers[i].gethost() << std::endl;
         std::vector<ServLocation>* tmp = (this->servers[i].getLocations());        
         std::cout << "ports are ";
         this->servers[i].printPorts();
         if (tmp != nullptr){
-            for (int i = 0; i < tmp->size(); i++)
+            for (int i = 0; i < (int)tmp->size(); i++)
             {
                 std::cout << "location path: "  << (*tmp)[i].getLocationPath() << std::endl;
                 std::cout << "location index: "  << (*tmp)[i].getLocationIndex() << std::endl;
@@ -305,6 +277,3 @@ Config::Config()
 Config::~Config()
 {
 }
-
-
-#endif

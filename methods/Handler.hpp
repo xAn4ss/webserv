@@ -2,7 +2,6 @@
 #ifndef HANDLER_HPP
 #define HANDLER_HPP
 
-#include "../Request.hpp"
 #include <iostream>
 #include <fstream>
 
