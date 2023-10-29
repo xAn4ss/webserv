@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <map>
 #include <algorithm>
 #include <unistd.h>
@@ -23,6 +24,9 @@ private:
     std::string                 _return;
     std::string                 _client_max_body_size;
     std::map<std::string, int>  _methods;
+    std::string                 _cgi_path;
+    std::vector<std::string>    _cgi_execs;
+
 public:
     ServLocation(/* args */);
     ~ServLocation();
@@ -31,6 +35,8 @@ public:
     int setLocationPath(std::string s);
     int setLocationMethods(std::string *method, int &size);
     int setLocationAutoIndex(std::string *s, int& size);
+    int setLocationCgiPath(std::string *s, int& size);
+    int setLocationCgiExec(std::string *s, int& size);
     int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
     std::string getLocationRoot();
     std::string getLocationPath();

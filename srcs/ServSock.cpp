@@ -1,5 +1,5 @@
-#include "Includes/ServSock.hpp"
-#include "methods/Handler.hpp"
+#include "../Includes/ServSock.hpp"
+#include "../methods/Handler.hpp"
 
 void ServSock::sendResponse(int n, Response rsp){
     if (chunked){

@@ -1,4 +1,4 @@
-#include "Includes/Config.hpp"
+#include "../Includes/Config.hpp"
 
 std::vector<Server>* Config::getServers(){
     if (servers.empty())

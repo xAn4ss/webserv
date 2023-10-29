@@ -1,4 +1,4 @@
-#include "Includes/Server.hpp"
+#include "../Includes/Server.hpp"
 
 bool Server::getAutoIndex(){
     return _isAutoIndex;
@@ -149,7 +149,7 @@ int Server::setMethods(std::string *method, int &size){
                 std::cout << "Error in methods syntax." << std::endl;
                 return 1;
             }
-            std::cout << it->first<< "("<< method[i] << ")";
+            // std::cout << it->first<< "("<< method[i] << ")";
             if (it->first == method[i])
             {
                 f = 1;
@@ -160,14 +160,14 @@ int Server::setMethods(std::string *method, int &size){
                 it->second = 0;
 
             }
-            std::cout << it->second << std::endl;
+            // std::cout << it->second << std::endl;
         }
         it++;
     }
-    std::cout << "Methods are :"<< std::endl;
-    std::cout << "GET : "<< _methods["GET"]<< std::endl;
-    std::cout << "POST : "<< _methods["POST"]<< std::endl;
-    std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
+    // std::cout << "Methods are :"<< std::endl;
+    // std::cout << "GET : "<< _methods["GET"]<< std::endl;
+    // std::cout << "POST : "<< _methods["POST"]<< std::endl;
+    // std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
     return 0;
 }
 

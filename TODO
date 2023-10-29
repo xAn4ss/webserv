@@ -1,5 +1,9 @@
-=>body size / auto index
-cgi
+=>body size
+cgi => cgi_exec py php(perl ruby) 
+    => cgi_path 
+
+
+
 post 
 delete
 

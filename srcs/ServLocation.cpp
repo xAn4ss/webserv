@@ -1,4 +1,4 @@
-#include "Includes/ServLocation.hpp"
+#include "../Includes/ServLocation.hpp"
 
 ServLocation::ServLocation(){
     _index = "";
@@ -23,7 +23,7 @@ int ServLocation::setLocationMethods(std::string *method, int &size){
                 std::cout << "Error in methods syntax." << std::endl;
                 return 1;
             }
-            std::cout << it->first<< "("<< method[i] << ")";
+            // std::cout << it->first<< "("<< method[i] << ")";
             if (it->first == method[i])
             {
                 f = 1;
@@ -34,14 +34,14 @@ int ServLocation::setLocationMethods(std::string *method, int &size){
                 it->second = 0;
 
             }
-            std::cout << it->second << std::endl;
+            // std::cout << it->second << std::endl;
         }
         it++;
     }
-    std::cout << "Methods are :"<< std::endl;
-    std::cout << "GET : "<< _methods["GET"]<< std::endl;
-    std::cout << "POST : "<< _methods["POST"]<< std::endl;
-    std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
+    // std::cout << "Methods are :"<< std::endl;
+    // std::cout << "GET : "<< _methods["GET"]<< std::endl;
+    // std::cout << "POST : "<< _methods["POST"]<< std::endl;
+    // std::cout << "DELETE : "<< _methods["DELETE"]<< std::endl;
     return 0;
 }
 
@@ -151,6 +151,40 @@ int ServLocation::setLocationPath(std::string s)
     _locationPath = s;
     return 0;
 }
+
+int ServLocation::setLocationCgiPath(std::string *s, int& size){
+    if (size != 2){
+        std::cout << "error in Location cgi path" << std::endl;
+        return 1;
+    }
+    struct stat slatt;
+    if (!stat(s[1].c_str(), &slatt) && S_ISDIR(slatt.st_mode))
+        _cgi_path = s[1];
+    else
+    {
+        std::cout << "error in Location cgi path (path inexistant)" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+int ServLocation::setLocationCgiExec(std::string *s, int& size){
+    if (size < 2 || size > 3){
+        std::cout << "error in location cgi execs" << std::endl;
+        return 1;
+    }
+    for (int i = 1; i < size; i++)
+    {
+        if (s[i].compare("py") && s[i].compare("php"))
+        {
+            std::cout << "error in location cgi execs" << std::endl;
+            return 1;
+        }
+        _cgi_execs.push_back(s[i]);
+    }
+    return 0;
+}
+
 int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::vector<std::string>::iterator end){
     std::vector<std::string> lct(begin, end);
     // std::cout << "-* "<<(*begin).substr((*begin).find_first_of(" \t")+1,
@@ -188,6 +222,13 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
         {
             if (setLocationMethods(splitIt((*begin).c_str(), size), size))
                 return 1;
+        }
+        else if (!strncmp((*begin).c_str(), "cgi_path", 8)){
+            if (setLocationCgiPath(splitIt((*begin).c_str(), size), size))
+                return 1;   
+        }else if (!strncmp((*begin).c_str(), "cgi_exec", 8)){
+            if (setLocationCgiExec(splitIt((*begin).c_str(), size), size))
+                return 1;   
         }
         // std::cout << *begin << std::endl;
         begin++;

@@ -1,5 +1,5 @@
-SRC = main.cpp Webserv.cpp Request.cpp Response.cpp \
-		Server.cpp ServLocation.cpp ServSock.cpp Socket.cpp Config.cpp
+SRC = main.cpp srcs/Webserv.cpp srcs/Request.cpp srcs/Response.cpp \
+		srcs/Server.cpp srcs/ServLocation.cpp srcs/ServSock.cpp srcs/Socket.cpp srcs/Config.cpp
 
 FLAGS = -Wall -Wextra -Werror -std=c++98
 
