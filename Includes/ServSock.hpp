@@ -8,6 +8,10 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <iostream>
+#include <cstdlib>
+#include <sstream>
+#include <string>
 
 class ServSock
 {

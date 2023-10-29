@@ -9,10 +9,10 @@ std::map<std::string, int> Server::getMethods(){
 }
 
 std::string Server::getErrorPath(){
-    if (_error_path.back() == '/')
+    ///should be verified
+    if (*(_error_path.rbegin()) == '/')
         return _error_path;
-    else
-        return _error_path + "/";
+    return _error_path + "/";
 }
 
 
@@ -27,14 +27,14 @@ std::string Server::getRoot(){
 ServLocation* Server::getLocation(std::string s){
             // std::cout << s << "." << std::endl;
     if (_location.empty())
-        return nullptr;
+        return NULL;
     for (std::vector<ServLocation>::iterator it = _location.begin(); it != _location.end(); it++){
         if (!(*it).getLocationPath().compare(s))
         {
             return &(*it);
         }
     }
-    return nullptr;
+    return NULL;
 }
 
 std::vector<int> Server::getPorts()
@@ -75,7 +75,7 @@ int Server::checkServ(){
 std::vector<ServLocation>* Server::getLocations(){
 
     if (_location.empty())
-        return nullptr;
+        return NULL;
     return &_location;
 }
 

@@ -2,7 +2,7 @@
 
 std::vector<Server>* Config::getServers(){
     if (servers.empty())
-        return nullptr;
+        return NULL;
     return &servers;
 }
 
@@ -44,7 +44,7 @@ void getRidOfTabs(std::vector<std::string> &s){
             if ((int)s[i].find_first_not_of("\t ") != -1 )
             {
                 tmp = s[i].substr(s[i].find_first_not_of("\t "));
-                if (s[i].front() == '\t')
+                if (*(s[i].begin()) == '\t')
                     s[i].swap(tmp);
             }
             else
@@ -87,18 +87,20 @@ int Config::confParse(){
         int c = 0;
         b = 0;
         int hash_f = 0;
-        if ((*(it + i)).front() == '#')
+        if ((*(*(it + i)).begin()) == '#')
             hash_f = -1;
-        if (!hash_f && (!strncmp(configVec[i].c_str(), "server", 6)) && ((!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{') || configVec[i].front() == '#'))
+        if (!hash_f && (!strncmp(configVec[i].c_str(), "server", 6)) && ((!strncmp(configVec[i+1].c_str(), "{", 1) 
+            || *(configVec[i].rbegin()) == '{') || *(configVec[i].begin()) == '#'))
         {
             hash_f = 0;    
-            if(configVec[i+1].back() == '{')
+            if(*(configVec[i+1].rbegin()) == '{')
                 i++;
             i++;
             b = i;
-            while (configVec[i].back() != '}')
+            while (*(configVec[i].rbegin()) != '}')
             {
-                if (!strncmp(configVec[i].c_str(), "location", 8) && (!strncmp(configVec[i+1].c_str(), "{", 1) || configVec[i].back() == '{'))
+                if (!strncmp(configVec[i].c_str(), "location", 8) && (!strncmp(configVec[i+1].c_str(), "{", 1) 
+                    || *(configVec[i].rbegin()) == '{'))
                 {
                     if(!strncmp(configVec[i+1].c_str(), "{", 1))
                         i++;
@@ -182,7 +184,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             i++;
         }
         else if (!strncmp((*i).c_str(), "location", 8) &&
-         (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*i).back() == '{')))
+         (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*(*i).rbegin()) == '{')))
         {
             ServLocation location;
             std::vector<std::string>::iterator begin = i;
@@ -254,7 +256,7 @@ int Config::parse_config()
         std::vector<ServLocation>* tmp = (this->servers[i].getLocations());        
         std::cout << "ports are ";
         this->servers[i].printPorts();
-        if (tmp != nullptr){
+        if (tmp != NULL){
             for (int i = 0; i < (int)tmp->size(); i++)
             {
                 std::cout << "location path: "  << (*tmp)[i].getLocationPath() << std::endl;

@@ -76,7 +76,10 @@ buildResponse => buildHeader
 void ServSock::buildHead(int n, Response& rsp, Request rqst){
 
     rsp + (rqst.get_http_v() + " ");
-    rsp + std::to_string(rsp.get_status());
+    std::ostringstream s;
+    s << rsp.get_status();
+    rsp + s.str();
+    // rsp + std::to_string(rsp.get_status());
     if (rsp.get_status() == 200)
         rsp + " OK\r\n";
     else if (rsp.get_status() == 301)
@@ -84,21 +87,23 @@ void ServSock::buildHead(int n, Response& rsp, Request rqst){
     else{
         file = servSock[n].second.getErrorPath();
         if (rsp.get_status() == 404){
-            file += std::to_string(rsp.get_status()) + ".html";
+            file += s.str() + ".html";
             rsp + " Not Found";
         }else if (rsp.get_status() == 403){
-            file += std::to_string(rsp.get_status()) + ".html";
+            file += s.str() + ".html";
             rsp + " Forbidden";
         }else if (rsp.get_status() == 501){
-            file += std::to_string(rsp.get_status()) + ".html";
+            //check error code
+            file += s.str() + ".html";
             rsp + " Not Implemented";
         }else//check for other error codes
             rsp + " undefined";
         rsp + "\r\n";
     }
 }
+
 void setContentLength(Response& rsp, std::string& chunkedData, std::string file){
-    std::ifstream s(file, std::ios::binary);
+    std::ifstream s(file.c_str(), std::ios::binary);
     std::vector<char> vec;
     char c;
     while (s.get(c))
@@ -106,7 +111,9 @@ void setContentLength(Response& rsp, std::string& chunkedData, std::string file)
     std::string tmp(vec.begin(), vec.end());
     chunkedData = tmp;
     s.close();
-    rsp + ("Content-Length: " + std::to_string(tmp.size()) + "\r\n\r\n");
+    std::ostringstream len;
+    len << (int)tmp.size();
+    rsp + ("Content-Length: " + len.str() + "\r\n\r\n");
 }
 
 void ServSock::buildResponse(int n, Response& rsp, Request rqst){
@@ -134,16 +141,18 @@ void ServSock::buildResponse(int n, Response& rsp, Request rqst){
         rsp + "Content-Type: video/mp4\r\n";
         setContentLength(rsp, chunkedData, file);
     }
-
+    //Not chunked request
     if (!chunked){
         std::string fileContent;
         std::cout << file << std::endl;
-        std::ifstream f(file);
+        std::ifstream f(file.c_str());
         std::string tm;
         while (getline(f, tm)){
             fileContent += (tm);
         }
-        rsp + ("Content-Length: " + std::to_string(fileContent.length())+ "\r\n\r\n");
+        std::ostringstream tmp;
+        tmp << (int)fileContent.length();
+        rsp + ("Content-Length: " + tmp.str() + "\r\n\r\n");
         rsp + fileContent;
     }
 }
@@ -199,7 +208,7 @@ void ServSock::processConnection(int n){
                         file = rqst.get_file() + "/";
                         rsp.set_status(301);
                     }
-                    else if (servSock[n].second.getLocation(rqst.get_file()) == nullptr 
+                    else if (servSock[n].second.getLocation(rqst.get_file()) == NULL 
                         ){
                             if (rqst.get_file().compare("/")){
                                 rsp.set_status(403);
@@ -263,7 +272,7 @@ void ServSock::processConnection(int n){
             }else{
     // if path doesnt mathc any file file = root + file; (root from serv or location)
                 std::string path = rqst.get_file();
-                if (servSock[n].second.getLocation("/") != nullptr 
+                if (servSock[n].second.getLocation("/") != NULL 
                     && servSock[n].second.getIndex().empty())
                     {// file = locationroot + file requested
                         path = (*servSock[n].second.getLocation("/") ).getLocationRoot() + rqst.get_file();
@@ -274,7 +283,7 @@ void ServSock::processConnection(int n){
                         }else
                             rsp.set_status(404);
                     }
-                else if (servSock[n].second.getLocation("/") == nullptr 
+                else if (servSock[n].second.getLocation("/") == NULL 
                     && !servSock[n].second.getIndex().empty())
                     {// file = servRoot + file requested;
                         path = servSock[n].second.getRoot() + rqst.get_file();

@@ -10,7 +10,7 @@ int Webserv::checkSocExistance(int socket){
 }
 
 int Webserv::startSockets(){
-    if (config.getServers() == nullptr)
+    if (config.getServers() == NULL)
         return (1);
     
     int i = 0 ;

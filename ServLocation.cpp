@@ -164,7 +164,7 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
         return 1;
     int size;
     begin++;
-    if ((*begin).back() == '{')
+    if (*((*begin).rbegin()) == '{')
         begin++;
     while (begin != end)
     {

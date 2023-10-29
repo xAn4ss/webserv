@@ -25,7 +25,7 @@ void Handler::handleMethod(){
         std::cout << "request content : " << content << std::endl;
         // upload temp
         std::string filepath = "/tmp/uploads/" + this->request.get_file();
-        std::ofstream outfile(filepath);
+        std::ofstream outfile(filepath.c_str());
         outfile << content << std::endl;
         outfile.close();
     }else if(this->request.get_method() == "DELETE"){
