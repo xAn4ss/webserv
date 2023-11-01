@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <map>
@@ -26,6 +27,9 @@ private:
     std::map<std::string, int>  _methods;
     std::string                 _cgi_path;
     std::vector<std::string>    _cgi_execs;
+    bool                        _isRedirected;
+    std::string                 _Redir_code;
+    std::string                 _redirected_to;
 
 public:
     ServLocation(/* args */);
@@ -37,7 +41,13 @@ public:
     int setLocationAutoIndex(std::string *s, int& size);
     int setLocationCgiPath(std::string *s, int& size);
     int setLocationCgiExec(std::string *s, int& size);
-    int processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end);
+    int setLocationIsRedirect(std::string *s, int& size);
+    int processLocation(std::vector<std::string>::iterator begin,
+         std::vector<std::string>::iterator end);
+    bool getLocationIsRedirected();
+    int getLocationRedirCode();
+    std::string getLocationRedirPath();
+    
     std::string getLocationRoot();
     std::string getLocationPath();
     std::map<std::string, int> getLocationMethods();

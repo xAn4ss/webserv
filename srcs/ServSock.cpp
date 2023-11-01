@@ -119,8 +119,11 @@ void setContentLength(Response& rsp, std::string& chunkedData, std::string file)
 void ServSock::buildResponse(int n, Response& rsp, Request rqst){
     chunked = 0;
     buildHead(n, rsp, rqst);
-    if (rsp.get_status() == 301)
+    if ((rsp.get_status() / 100) == 3)
+    {
+        std::cout << ">>>>> " << rsp.get_request() << std::endl;
         return;
+    }
     if ((file.length() - file.find(".css")) == 4)
 		rsp + "Content-Type: text/css\n";
 	else if((file.length() - file.find(".html")) == 5)
@@ -235,17 +238,24 @@ void ServSock::processConnection(int n){
                     else if (servSock[n].second.getLocation(rqst.get_file()))
                     {    // when u give a folder path u get index to that location/folder
                         ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
-                        if (tmp->getLocationAutoIndex() && tmp->getLocationIndex().empty())
+                        if (tmp->getLocationIsRedirected() == true)
                         {
-                            autIndexed = 1;
-                            rsp + buildAutoIndex(tmp->getLocationRoot());
+                            file = tmp->getLocationRedirPath();
+                            std::cout << "***-*-*-*-*-*- " << file << std::endl;
+                            rsp.set_status(tmp->getLocationRedirCode());
+                        }else{
+                            if (tmp->getLocationAutoIndex() && tmp->getLocationIndex().empty())
+                            {
+                                autIndexed = 1;
+                                rsp + buildAutoIndex(tmp->getLocationRoot());
+                            }
+                            if ((*servSock[n].second.getLocation(rqst.get_file())).getLocationMethods()["GET"] > 0)
+                            {
+                                file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
+                                rsp.set_status(200);
+                            }else
+                                rsp.set_status(501);
                         }
-                        if ((*servSock[n].second.getLocation(rqst.get_file())).getLocationMethods()["GET"] > 0)
-                        {
-                            file = (*servSock[n].second.getLocation(rqst.get_file())).getLocationIndex();
-                            rsp.set_status(200);
-                        }else
-                            rsp.set_status(501);
                     }else
                         rsp.set_status(403);
                 }else{

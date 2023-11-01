@@ -264,6 +264,9 @@ int Config::parse_config()
                 if ((*tmp)[i].getLocationAutoIndex()){
                     std::cout << "location autoIndex On." << std::endl;
                 }
+                if ((*tmp)[i].getLocationIsRedirected() == true){
+                    std::cout << "Location Redirected to : "<< (*tmp)[i].getLocationRedirPath() << std::endl;
+                }
 
             }
         }
