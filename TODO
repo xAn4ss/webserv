@@ -1,8 +1,8 @@
-=>body size
+=>client body size
 cgi => cgi_exec py php(perl ruby) 
     => cgi_path 
 
-
+=> return directive Done, Not checked.
 
 post 
 delete

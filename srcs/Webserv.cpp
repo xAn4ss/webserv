@@ -14,7 +14,7 @@ int Webserv::startSockets(){
         return (1);
     
     int i = 0 ;
-    int max_fd;
+    int max_fd = 0;
     fd_set port_fd;
     std::vector<int> tmp_fd;
     ServSock servSock;
