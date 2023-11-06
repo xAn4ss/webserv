@@ -28,6 +28,7 @@ void Socket::close_sock(){
 }
 
 void Socket::set_request(std::string req){
+    
     this->request = req;
 }
 
