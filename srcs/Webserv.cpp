@@ -71,6 +71,7 @@ int Webserv::startSockets(){
     }
         std::string tmp;
     int lenght = 0;
+    int isEnd = 0;
     std::string finalReq; 
     while (true) {
         FD_ZERO(&port_fd);
@@ -105,33 +106,69 @@ int Webserv::startSockets(){
                     }else if (rcv > 0){
                         buf[rcv] = '\0';
                         std::string t = buf;
-                        // std::cout << "==>>" << t << std::endl;
+                        std::cout << "==>" << t << std::endl;
                         std::string::iterator it = t.begin();
-                        size_t header = t.find("\r\n\r\n");
                         size_t x = t.find("\nContent-Length: ");
-                        if (header != std::string::npos)
-                        {
-                            if (x == std::string::npos){
-                                header = 0;
-                                lenght = rcv;
-                            }else{
-                                std::string conLenght = t.substr(x,t.find_first_of("\n", x+1) - x);
+                        if (!isEnd){
+                            if (x != std::string::npos){
+                                std::cout << "kayne" << std::endl;
+                                std::string conLenght = t.substr(x,t.find_first_of("\n", x+1) - x);                                
                                 std::istringstream len(conLenght.substr(conLenght.find_first_not_of("\nContent-Length: ")));
                                 len >> lenght;
-                                lenght += header + 4;
-                                finalReq.insert(finalReq.begin(), it, it+(rcv-header));
-                                lenght -= (rcv);
+                                lenght += 4;
+                                std::cout << "==>" << lenght << std::endl;
+                                size_t header = t.find("\r\n\r\n");
+                                finalReq.insert(finalReq.begin(), it, it + header + 4);
+                                std::cout << "->" << finalReq << "<-" << std::endl;
+                                finalReq.insert(finalReq.begin()+finalReq.size(), it+header+4, t.end());
+                                std::cout << "->" << finalReq << "<-" << std::endl;
+                                lenght -= (rcv-header);
+                                isEnd = 1;
+                                if (!lenght)
+                                    isEnd = 0;
+                            }else{
+                                std::cout << "makaynch" << std::endl;
+                                finalReq.insert(finalReq.begin(), it, t.end());                 
                             }
-                        }else if (header == std::string::npos || x == std::string::npos) {
-                            finalReq.insert(finalReq.begin() + (int)finalReq.size(), it+header, t.end());
+                        }
+                        else{
+                            finalReq.insert(finalReq.begin()+finalReq.size(), it, t.end());
                             lenght -= rcv;
-
+                            if (!lenght)
+                                isEnd = 0;
                         }
-                        if (!lenght || x == std::string::npos){
+                        if (!isEnd){
+                            std::cout << "=>" << lenght << std::endl;
+                            std::cout << "===>>" << finalReq << "<<<<=====" << std::endl;
                             servSock[i].first.set_request(finalReq);
-                            std::cout << "===>  " << servSock[i].first.get_request() << std::endl;
                             servSock.processConnection(i);
+                            finalReq.erase(finalReq.begin(), finalReq.end());                  
+                            // finalReq.clear();
                         }
+
+
+                        // if (x != std::string::npos)
+                        // {
+                        //         // std::cout << "if ==>>" << t.substr(x+17, t.find_first_not_of("\n",x+1))
+                        //         //     << "..." << std::endl;
+                        //         lenght += header + 4;
+                        //         finalReq.insert(finalReq.begin(), it, it+(rcv-header));
+                        //         lenght -= (rcv);
+                        //         std::cout << "if ==>>" << finalReq << std::endl;
+                        //         finalReq.insert(finalReq.begin() + (int)finalReq.size(), it+header, t.end());
+                        //         lenght -= rcv;
+                        //         std::cout << "if ==>>" << finalReq << std::endl;
+                        // }else{
+                        //     finalReq.insert(finalReq.begin() + (int)finalReq.size(), it+header, t.end());
+                        //     lenght -= rcv;
+                        //     // std::cout << "else ==>>" << finalReq << std::endl;
+
+                        // }
+                        // if (!lenght){
+                        //     servSock[i].first.set_request(finalReq);
+                        //     std::cout << "===>  " << servSock[i].first.get_request() << std::endl;
+                        //     servSock.processConnection(i);
+                        // }
                     }else{
                         std::cout << "~~Disconnected~~" << std::endl;
                         servSock[i].first.close_sock();
