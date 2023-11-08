@@ -1,5 +1,6 @@
 #include "../Includes/ServSock.hpp"
 #include "../methods/Handler.hpp"
+#include "../cgi/cgi_handler.hpp"
 
 void ServSock::sendResponse(int n, Response rsp)
 {
@@ -276,6 +277,14 @@ void ServSock::processConnection(int n)
                         std::cout << "Request :\n"<< servSock[n].first.get_request() 
                             << "========= ===========" << std::endl;
                         std::cout << tmp->getLocationCgiFile() << std::endl;
+                        //hna CGI
+                        //int inputpipe[2];
+                        //int outputpipe[2];
+                        //if (pipe(inputpipe) == -1 || pipe(outputpipe) == -1){
+                        //    std::cerr << "failed to iopen pipes" << std::endl;
+                        //    return;
+                        //}
+                        
                         std::cout << "..." << std::endl;
                         return ;
                     }
