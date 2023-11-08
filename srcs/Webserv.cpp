@@ -105,29 +105,30 @@ int Webserv::startSockets(){
                         return -1;
                     }else if (rcv > 0){
                         buf[rcv] = '\0';
-                        std::string t = buf;
-                        std::cout << "==>" << t << std::endl;
+                        //std::string t = buf; 
+                         std::string t(buf, rcv); // added by sami 
+                        //std::cout << "==>" << t << std::endl;
                         std::string::iterator it = t.begin();
                         size_t x = t.find("\nContent-Length: ");
                         if (!isEnd){
                             if (x != std::string::npos){
-                                std::cout << "kayne" << std::endl;
+                            //    std::cout << "kayne" << std::endl;
                                 std::string conLenght = t.substr(x,t.find_first_of("\n", x+1) - x);                                
                                 std::istringstream len(conLenght.substr(conLenght.find_first_not_of("\nContent-Length: ")));
                                 len >> lenght;
                                 lenght += 4;
-                                std::cout << "==>" << lenght << std::endl;
+                               // std::cout << "==>" << lenght << std::endl;
                                 size_t header = t.find("\r\n\r\n");
                                 finalReq.insert(finalReq.begin(), it, it + header + 4);
-                                std::cout << "->" << finalReq << "<-" << std::endl;
+                              //  std::cout << "->" << finalReq << "<-" << std::endl;
                                 finalReq.insert(finalReq.begin()+finalReq.size(), it+header+4, t.end());
-                                std::cout << "->" << finalReq << "<-" << std::endl;
+                                //std::cout << "->" << finalReq << "<-" << std::endl;
                                 lenght -= (rcv-header);
                                 isEnd = 1;
                                 if (!lenght)
                                     isEnd = 0;
                             }else{
-                                std::cout << "makaynch" << std::endl;
+                                //std::cout << "makaynch" << std::endl;
                                 finalReq.insert(finalReq.begin(), it, t.end());                 
                             }
                         }
@@ -138,8 +139,8 @@ int Webserv::startSockets(){
                                 isEnd = 0;
                         }
                         if (!isEnd){
-                            std::cout << "=>" << lenght << std::endl;
-                            std::cout << "===>>" << finalReq << "<<<<=====" << std::endl;
+                            //std::cout << "=>" << lenght << std::endl;
+                            //std::cout << "===>>" << finalReq << "<<<<=====" << std::endl;
                             servSock[i].first.set_request(finalReq);
                             servSock.processConnection(i);
                             finalReq.erase(finalReq.begin(), finalReq.end());                  

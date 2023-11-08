@@ -1,0 +1,45 @@
+Orange est une société française de télécommunications. Elle comptait à la fin de 2019 près de 266 millions9 de clients dans le monde1, des chiffres en hausse par rapport à ceux affichés en 201810. En 2019, l'entreprise est leader ou second opérateur dans 75 % des pays européens où elle est implantée et dans 83 % des pays en Afrique et au Moyen-Orient11.
+
+Orange était à l'origine une entreprise de télécommunications britannique devenue, en 1999, la filiale de Mannesmann, puis en 2000 celle du groupe France Télécom, entreprise publique. L'ancien monopole public français s'est donc internationalisé à la suite du rachat d'Orange. Le nouveau groupe ainsi créé est présent notamment en Europe, en Afrique et dans les Antilles. À partir du rachat d'Orange, la plupart des marques du groupe France Télécom sont passées sous la marque Orange. Depuis février 2012 et le passage sous la marque Orange des activités de téléphonie fixe, la totalité des offres commercialisées par France Télécom utilise cette marque, qui, le 1er juillet 2013, est devenue la nouvelle appellation du groupe. Orange employait en 2019 près de 148 000 personnes12, dont 88 000 en France.
+
+En 2018, Orange a réalisé un chiffre d'affaires de 41,391 milliards d'euros pour l'ensemble de ses activités et comptait 266 millions de clients dans le monde dont 201 millions de clients en téléphonie mobile et 18,2 millions de clients haut débit fixe9.
+
+Orange élargit ses activités à la vente de contenu (musique, cinéma, téléchargement…), au commerce électronique, à la publicité en ligne, aux solutions M2M, domotique et de téléassistance.
+
+Histoire
+Les télécommunications, service industriel de l'État
+Article détaillé : Postes, télégraphes et téléphones (France).
+Durant la Révolution française, en 1792, le premier réseau de communication voit le jour pour permettre d'acheminer rapidement les informations dans un pays en guerre et peu sûr. Il s'agit du réseau de télégraphie optique de Chappe.
+
+Après l'invention du télégraphe électrique et ensuite du téléphone, l'État français crée en 1878 un ministère des Postes et Télégraphes. Ce dernier annexe bientôt les services du téléphone qui sont nationalisés en 1889. Pourtant, ce n'est qu'en 1923, que le second « T » apparaît, le ministère des P & T devenant celui des PTT.
+
+En 1941, une direction générale des Télécommunications est créée au sein de ce ministère et en 1944 le Centre national d'études des télécommunications (CNET) a pour mission de développer l'industrie des télécommunications en France.
+
+Dans les années 1970, la France met les bouchées doubles pour rattraper son retard sur plusieurs autres nations avec le programme « delta LP » (accroissement des lignes principales). C'est à cette époque que fut construite la plus grande partie de la boucle locale. De plus, avec le concours des industriels français sont mis au point par les ingénieurs et chercheurs du CNET la commutation numérique et le Minitel.
+
+Mention spéciale concernant le GSM et l'apport décisif de l'ancêtre d'Orange et du CNET:
+
+En 1981, au sein de la CEPT, l'idée d'une norme pan-européenne numérique de 2ème génération -pour en finir avec les systèmes 1G incompatibles entre eux et s'arrêtant aux frontières- fait son apparition. La concrétisation de cette idée a été rendue possible grâce aux efforts conjoints R&D publics des administrations françaises (DGT et CNET formant une équipe projet) et allemandes des postes et télécommunications. Ces efforts ont notamment permis de valider la faisabilité de ce système et de définir les concepts de base du standard GSM (numérique, TDMA, hand over, saut de fréquences, roaming, etc). En 2018, 2 européens, le suédois Thomas Haug [archive] et le français Philippe Dupuis [archive], ont co-reçu la médaille IEEE/RSE James Clerk Maxwel [archive]l pour leur contribution à la naissance de la première norme numérique mobile, le GSM, servant de base à la communication des smartphones. En effet, le GSM 2G a servi de socle à la 3G, 4G et 5G. Ceci fait donc des 2 opérateurs Orange, avec son ancêtre la DGT (Direction Générale des Télécommunications)/France Telecom et de Deutsche Telekom, avec son ancêtre la Deutshe Bunderpost, les co-concepteurs de la téléphonie mobile telle que nous la connaissons. Ce fait méconnu du grand public constitue un des plus grands succès de coopération technique et politique européenne réussie. Il a été créateur de beaucoup de richesses en Europe, les industriels européens ayant un temps d'avance; le reste du monde n'y croyant pas. De nos jours, le marché mondial de la téléphonie mobile, basé exclusivement sur la famille des normes GSM, représente 5% du PIB mondial et plus de 5,4 milliards d'utilisateurs (source GSMA intelligence 2023 [archive])
+
+Création de la société anonyme France Télécom
+Article détaillé : France Télécom.
+
+Une cabine publique France Télécom.
+Pour répondre à une directive européenne de mise en concurrence des services de télécommunications (téléphonie fixe principalement), sous forme de parution de son Livre Vert en juillet 1987, la direction générale des Télécommunications est renommée « France Télécom13 » le 1er janvier 1988.
+
+La loi no 90-568 du 2 juillet 1990 transforme France Télécom en un exploitant autonome de droit public à partir du 1er janvier 1991. Marcel Roulet en est le premier président. Cette structure est dotée d'une personnalité morale distincte de l'État et acquiert une autonomie financière. Auparavant, le budget des télécommunications était inscrit au sein du budget annexe des PTT voté chaque année par l'Assemblée nationale.
+
+Le 13 septembre 1995, Michel Bon est nommé président du Groupe France Télécom.
+
+Pour préparer l'ouverture à la concurrence au 1er janvier 1998, la loi no 96-660 est promulguée en juillet 1996 transformant l'exploitant autonome de droit public en société anonyme au 1er janvier 1997 dont l'État français est le seul actionnaire, créant ainsi l'entreprise nationale France Télécom.
+
+En 1997, le capital de la nouvelle société anonyme est ouvert avec succès, l'action est vendue 30 euros. Une seconde ouverture aura lieu en 1998 malgré la crise des marchés émergents, puis la bulle Internet qui rend les marchés boursiers euphoriques en 1999.
+
+Orange, opérateur mobile britannique
+En 1990, Pactel Corporation, British Aerospace, Millicom et Matra créent le consortium Communications Microtel avec pour but de développer une offre concurrente à celle de Vodafone au Royaume-Uni. En juillet 1991, Hutchison Whampoa devient actionnaire majoritaire de Microtel en prenant possession de 65 % des parts de la marque14.
+
+En avril 1994, Microtel devient Orange plc et est lancé sur le marché britannique. En 1996, lors de l'introduction en bourse, les principaux actionnaires sont Hutchison Whampoa et British Aerospace détenant respectivement 48 % et 22 % du capital. En juillet 1997, la stratégie de croissance a payé : le cap du million de clients est franchi. L’entreprise présente également le plus faible taux de roulement, affiche de meilleures marges que ses concurrents et obtient d’excellents niveaux de satisfaction de la clientèle[réf. nécessaire].
+
+En septembre 1998, Orange est lancée à Hong Kong et passe de la quatrième à la première place du marché en six mois.[réf. nécessaire] En 1999, Orange s'implante en Autriche, en Belgique et en Suisse et une concession de licences de marque à Hong Kong, en Australie, en Israël et en Inde à différents opérateurs. En Israël, Orange gagne plus de 400 000 clients lors de la première année[réf. nécessaire].
+
+Fin 1999, l'allemand Mannesmann annonce l'acquisition d'Orange pour un prix équivalent à 7 900 euros par client soit 33 milliards de dollars US15. En comparaison,
