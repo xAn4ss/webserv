@@ -66,7 +66,7 @@ bool ServLocation::getLocationAutoIndex()
 
 std::string ServLocation::getLocationIndex(){
     if(_index.empty())
-        return "emtpy";
+        return "";
     return _index;
 }
 
