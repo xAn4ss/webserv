@@ -229,7 +229,7 @@ std::string ServLocation::getLocationRedirPath(){
 int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::vector<std::string>::iterator end){
     std::vector<std::string> lct(begin, end);
     // std::cout << "-* "<<(*begin).substr((*begin).find_first_of(" \t")+1,
-    //  ((*begin).size()- (*begin).find_last_not_of("{ \t"))) << std::endl;
+    // ((*begin).size()- (*begin).find_last_not_of("{ \t"))) << std::endl;
 
     int b = (*begin).find_first_of(" \t") + 1;
     int e = (*begin).find_last_not_of("{ \t") ;
