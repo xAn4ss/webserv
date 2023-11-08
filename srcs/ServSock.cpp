@@ -39,6 +39,7 @@ ServSock::ServSock(/* args */)
 std::string ServSock::fct(std::string file, int &s)
 {
     int fd = open(file.c_str(), O_RDONLY);
+    std::cout << "]]]]]>>> " << file << std::endl;
     if (fd == -1)
     {
         std::cout << "apah" << std::endl;
@@ -213,6 +214,7 @@ void ServSock::processConnection(int n)
     std::cout << "=== " << rqst.get_file() << std::endl;
     rsp.set_status(200);
     int autIndexed = 0;
+    chunked = 0;
     if (!rqst.get_method().compare("GET"))
     {
         // if dir => check index of that directory in server lcoation

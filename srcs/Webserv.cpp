@@ -38,10 +38,10 @@ int Webserv::startSockets(){
                 perror("sockopt");
                 return -1;
             }
-            // if (setsockopt(sock.get_socket(), SOL_SOCKET, SO_REUSEPORT, &x, sizeof(x)) == -1){
-            //     perror("sockopt");
-            //     return -1;
-            // }
+            if (setsockopt(sock.get_socket(), SOL_SOCKET, SO_NOSIGPIPE, &x, sizeof(x)) == -1){
+                perror("sockopt nosigpip");
+                return -1;
+            }
             int bnd = bind(sock.get_socket(), (struct sockaddr *)&sock_addr, sizeof(sock_addr));
             if (bnd < 0)
             {
