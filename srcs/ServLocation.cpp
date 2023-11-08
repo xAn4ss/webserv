@@ -4,6 +4,7 @@ ServLocation::ServLocation(){
     _index = "";
     _isAutoIndex = false;
     _isRedirected = false;
+    _isCgi = false;
     _methods.insert(std::make_pair("GET", 1));
     _methods.insert(std::make_pair("POST", 1));
     _methods.insert(std::make_pair("DELETE", 1));
@@ -117,6 +118,25 @@ int ServLocation::setLocationIndex(std::string* s, int& size){
     return 0;
 }
 
+std::string ServLocation::getLocationCgiFile(){
+    return _locationPath + _cgi_file;
+}
+std::string ServLocation::getCgiFile(){
+    struct dirent *dir;
+    DIR *d = opendir(_locationPath.c_str());
+    std::string cgiFile; 
+    while ((dir = readdir(d)) != NULL)
+    {
+        std::string cont;
+        cont = dir->d_name;
+        for (size_t i = 0; i < _cgi_execs.size(); i++){
+            if (cont.find(_cgi_execs[i]) != std::string::npos)
+                return cont;
+        }
+    }
+    return "";
+}
+
 int ServLocation::setLocationRoot(std::string* s, int& size){
     if (size != 2)
     {
@@ -180,6 +200,10 @@ int ServLocation::setLocationPath(std::string s)
     return 0;
 }
 
+bool ServLocation::getLocationIsCgi(){
+    return _isCgi;
+}
+
 int ServLocation::setLocationCgiPath(std::string *s, int& size){
     if (size != 2){
         std::cout << "error in Location cgi path" << std::endl;
@@ -193,7 +217,14 @@ int ServLocation::setLocationCgiPath(std::string *s, int& size){
         std::cout << "error in Location cgi path (path inexistant)" << std::endl;
         return 1;
     }
+    _isCgi = true;
     return 0;
+}
+
+std::vector<std::string>* ServLocation::getLocationCgiExecs(){
+    if (_cgi_execs.empty())
+        return NULL;
+    return &_cgi_execs;   
 }
 
 int ServLocation::setLocationCgiExec(std::string *s, int& size){
@@ -203,12 +234,17 @@ int ServLocation::setLocationCgiExec(std::string *s, int& size){
     }
     for (int i = 1; i < size; i++)
     {
-        if (s[i].compare("py") && s[i].compare("php"))
+        if (s[i].compare(".py") && s[i].compare(".php"))
         {
             std::cout << "error in location cgi execs" << std::endl;
             return 1;
         }
         _cgi_execs.push_back(s[i]);
+    }
+    _cgi_file = getCgiFile();
+    if (_cgi_file.empty()){
+        std::cout << "Error in cgi file" << std::endl;
+        return 1;
     }
     return 0;
 }

@@ -272,6 +272,13 @@ void ServSock::processConnection(int n)
                         std::cout << "***-*-*-*-*-*- " << file << std::endl;
                         rsp.set_status(tmp->getLocationRedirCode());
                     }
+                    else if (tmp->getLocationIsCgi() == true){
+                        std::cout << "Request :\n"<< servSock[n].first.get_request() 
+                            << "========= ===========" << std::endl;
+                        std::cout << tmp->getLocationCgiFile() << std::endl;
+                        std::cout << "..." << std::endl;
+                        return ;
+                    }
                     else
                     {
                         if (tmp->getLocationAutoIndex() && tmp->getLocationIndex().empty())

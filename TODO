@@ -1,8 +1,10 @@
 =>client body size
 cgi => cgi_exec py php(perl ruby) 
     => cgi_path 
-
+=> check all content-types
 => return directive Done, Not checked.
+=> Uploads
+
 
 post 
 delete

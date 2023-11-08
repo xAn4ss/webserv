@@ -25,15 +25,18 @@ private:
     std::string                 _return;
     std::string                 _client_max_body_size;
     std::map<std::string, int>  _methods;
+    bool                        _isCgi;
     std::string                 _cgi_path;
     std::vector<std::string>    _cgi_execs;
     bool                        _isRedirected;
     std::string                 _Redir_code;
     std::string                 _redirected_to;
+    std::string                 _cgi_file;
 
 public:
     ServLocation(/* args */);
     ~ServLocation();
+    std::string getCgiFile();
     int setLocationRoot(std::string* s, int& size);
     int setLocationIndex(std::string* s, int& size);
     int setLocationPath(std::string s);
@@ -47,12 +50,15 @@ public:
     bool getLocationIsRedirected();
     int getLocationRedirCode();
     std::string getLocationRedirPath();
-    
+    std::string getLocationCgiFile();
+    bool getLocationIsCgi();
     std::string getLocationRoot();
     std::string getLocationPath();
     std::map<std::string, int> getLocationMethods();
     std::string getLocationIndex();
     bool getLocationAutoIndex();
+    std::vector<std::string>* getLocationCgiExecs();
+
     // int parse
 };
 
