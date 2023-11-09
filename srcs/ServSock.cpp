@@ -379,8 +379,16 @@ void ServSock::processConnection(int n)
             response = "HTTP/1.1 204 No Content\r\n\r\n";
         }else if (status == 404){
             response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 27\r\n\r\n<h1>404 file not found</h1>";
+        }
+    //else{
+    //      response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
+    //    }
+        else if (status == 403){
+            response = "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\n\r\n";
+        }else if (status == 500){
+            response = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
         }else {
-            response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
+          response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
         }
         send(servSock[n].first.get_socket(), response.c_str(), response.size(), 0);
 

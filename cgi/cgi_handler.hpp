@@ -8,6 +8,5 @@ class cgi_handler
 
     private:
     
-}
-
+};
 #endif
