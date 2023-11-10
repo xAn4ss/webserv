@@ -40,7 +40,6 @@ ServSock::ServSock(/* args */)
 std::string ServSock::fct(std::string file, int &s)
 {
     int fd = open(file.c_str(), O_RDONLY);
-    std::cout << "]]]]]>>> " << file << std::endl;
     if (fd == -1)
     {
         std::cout << "apah" << std::endl;
@@ -370,7 +369,7 @@ void ServSock::processConnection(int n)
     }
     else
     {
-        Handler handler(rqst);
+        Handler handler(rqst, servSock[n].second.getUploadPath());
         int status = handler.handleMethod();
         std::string response = "";
         if(status == 201){

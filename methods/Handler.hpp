@@ -16,15 +16,17 @@
 class Handler {
 
     Request request;
-
+    std::string _uploadPath;
     public:
-        Handler(Request request);
+        Handler(Request request, std::string uplaods);
         int handleMethod();
 };
 
-Handler::Handler(Request request){
+Handler::Handler(Request request, std::string uploads){
     this->request = request;
+    this->_uploadPath = uploads;
 }
+
 void deleteFileOrDirectory(const std::string& path) {
     struct stat st;
     if (stat(path.c_str(), &st) == 0) {
@@ -47,7 +49,8 @@ int Handler::handleMethod(){
     if(this->request.get_method() == "POST"){
         std::cout << "POST METHOD !" << std::endl;
         std::string content = this->request.get_body();
-        std::string filepath = "uploads/" + this->request.get_file();
+
+        std::string filepath = this->_uploadPath + this->request.get_file();
         std::ofstream outfile(filepath.c_str());
         outfile << content << std::endl;
         outfile.close();
@@ -59,7 +62,7 @@ int Handler::handleMethod(){
     {
 
         std::string location = request.get_file(); // file to delete 
-        std::string directoryPath = "uploads/"; // The directory path
+        std::string directoryPath = _uploadPath; // The directory path
                 // Split the location into the directory and filename
         std::size_t lastSlash = location.rfind('/');
         std::string filename;
