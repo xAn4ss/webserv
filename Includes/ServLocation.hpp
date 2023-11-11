@@ -51,6 +51,7 @@ public:
     int getLocationRedirCode();
     std::string getLocationRedirPath();
     std::string getLocationCgiFile();
+    std::string getLocationCgiPath();
     bool getLocationIsCgi();
     std::string getLocationRoot();
     std::string getLocationPath();

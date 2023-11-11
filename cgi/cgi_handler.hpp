@@ -1,12 +1,14 @@
-#ifndef CGI_HANDLER
-# define CGI_HANDLER
+#ifndef CGI_HANDLER_HPP
+# define CGI_HANDLER_HPP
 
+#include <map>
 #include <vector>
-class cgi_handler
-{
-    public:
+#include <string>
+#include <sstream>
+#include <cstring>
+#include <iostream>
 
-    private:
-    
-};
+std::map<std::string, std::string> parseRequestHeader(const std::string& request);
+char** convertToEnvp(const std::map<std::string, std::string>& requestMap);
+
 #endif

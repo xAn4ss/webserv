@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include "../cgi/cgi_handler.hpp"
 
 class ServSock
 {
@@ -34,6 +35,7 @@ public:
     std::string fct(std::string file, int& s);
     void buildHead(int n, Response&, Request);
     void sendResponse(int, Response);
+    std::map<std::string, std::string> parseRequestHeader(Request rqt, int n, std::string cgi_path);
 };
 
 

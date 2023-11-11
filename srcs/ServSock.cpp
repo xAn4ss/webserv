@@ -2,6 +2,7 @@
 #include "../methods/Handler.hpp"
 #include "../cgi/cgi_handler.hpp"
 
+
 void ServSock::sendResponse(int n, Response rsp)
 {
     if (chunked)
@@ -40,6 +41,7 @@ ServSock::ServSock(/* args */)
 std::string ServSock::fct(std::string file, int &s)
 {
     int fd = open(file.c_str(), O_RDONLY);
+    std::cout << "]]]]]>>> " << file << std::endl;
     if (fd == -1)
     {
         std::cout << "apah" << std::endl;
@@ -212,6 +214,7 @@ void ServSock::processConnection(int n)
     rqst.parse(servSock[n].first.get_request());
     std::cout << "=== " << rqst.get_method() << std::endl;
     std::cout << "=== " << rqst.get_file() << std::endl;
+    std::cout << "=== " << rqst.get_body() << std::endl;
     rsp.set_status(200);
     int autIndexed = 0;
     chunked = 0;
@@ -273,17 +276,71 @@ void ServSock::processConnection(int n)
                         rsp.set_status(tmp->getLocationRedirCode());
                     }
                     else if (tmp->getLocationIsCgi() == true){
-                        std::cout << "Request :\n"<< servSock[n].first.get_request() 
-                            << "========= ===========" << std::endl;
                         std::cout << tmp->getLocationCgiFile() << std::endl;
                         //hna CGI
-                        //int inputpipe[2];
-                        //int outputpipe[2];
-                        //if (pipe(inputpipe) == -1 || pipe(outputpipe) == -1){
-                        //    std::cerr << "failed to iopen pipes" << std::endl;
-                        //    return;
-                        //}
-                        
+                        int inputpipe[2];
+                        int outputpipe[2];
+                        if (pipe(inputpipe) == -1 || pipe(outputpipe) == -1){
+                            std::cerr << "failed to open pipes" << std::endl;
+                            return;
+                        }
+                        pid_t child_pid = fork();
+                        if (child_pid == -1){
+                            std::cerr << "Forking failed" << std::endl;
+                            return ;
+                        }
+                        else if (child_pid == 0){
+                            close(inputpipe[1]);
+                            close(outputpipe[0]);
+
+                            dup2(inputpipe[0], 0);
+                            dup2(outputpipe[1], 1);
+                            //execute CGI script
+                            std::string cgi_path = tmp->getLocationCgiFile();
+                            char *cpath[] = {const_cast<char *>(cgi_path.c_str()), NULL};
+                            std::cerr << "CGI PATH : " << cgi_path << std::endl;
+                            std::cerr << "dkhl hna \n" << std::endl;
+                            std::cerr << "CGI PATH : " << cgi_path << std::endl;
+                            std::map<std::string, std::string> requestMap = parseRequestHeader(rqst, n, cgi_path);
+                            std::cerr << "hnna hnaaaaaaaaaaaaaaa" << std::endl;
+                            char** env_var = convertToEnvp(requestMap);//convert parsed request
+                            for (int i = 0; env_var[i] != NULL; ++i) {
+                                std::cerr << "env[" << i << "]: " << env_var[i] << std::endl;
+                            }
+                            if (execve("/mnt/c/Users/Rc/Desktop/web/cgi-bin/php-cgi",cpath, env_var) == -1)
+                            {
+                            // to be modified
+                            perror("execvp");
+                            return ;
+                            }
+                            std::cerr << "###########################" << std::endl;
+                            exit(1);
+                        }else {
+                            //in parent process
+                            close(inputpipe[0]);
+                            close(outputpipe[1]);
+
+                            write(inputpipe[1], servSock[n].first.get_request().c_str(), servSock[n].first.get_request().size());
+                            close(inputpipe[1]);
+
+                            char buf[1024];
+                            ssize_t bytes;
+                            std::string cgi_response;
+                            while ((bytes = read(outputpipe[0], buf, sizeof(buf))) > 0)
+                            {
+                                cgi_response.append(buf, bytes);
+                                //handle CGI script, senf it as HTTP response
+                            }
+                            close(outputpipe[0]);
+                            //std::string httpResponse;
+                            //httpResponse += "HTTP/1.1 200 OK\r\n";
+                            //httpResponse += "Content-Type: text/html\r\n";
+                            //httpResponse += "Content-Length: " + std::to_string(cgiOutput.size()) + "\r\n";
+                            //httpResponse += "\r\n";
+                            //httpResponse += cgiOutput;
+                            ///+/ For demonstration, you can send the HTTP response to the client or display it
+                            //std::cout << httpResponse << std::endl;
+                        }
                         std::cout << "..." << std::endl;
                         return ;
                     }
@@ -369,7 +426,7 @@ void ServSock::processConnection(int n)
     }
     else
     {
-        Handler handler(rqst, servSock[n].second.getUploadPath());
+        Handler handler(rqst);
         int status = handler.handleMethod();
         std::string response = "";
         if(status == 201){
@@ -378,16 +435,8 @@ void ServSock::processConnection(int n)
             response = "HTTP/1.1 204 No Content\r\n\r\n";
         }else if (status == 404){
             response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 27\r\n\r\n<h1>404 file not found</h1>";
-        }
-    //else{
-    //      response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
-    //    }
-        else if (status == 403){
-            response = "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\n\r\n";
-        }else if (status == 500){
-            response = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
         }else {
-          response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
+            response = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\nContent-Length: 31\r\n\r\n<h1>405 Method not allowed</h1>";
         }
         send(servSock[n].first.get_socket(), response.c_str(), response.size(), 0);
 
