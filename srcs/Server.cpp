@@ -15,25 +15,6 @@ std::string Server::getErrorPath(){
     return _error_path + "/";
 }
 
-std::string Server::getUploadPath(){
-    return _uploadsPath;
-}
-
-int Server::setUploadsPath(std::string *s, int &size){
-    if (size != 2){
-        std::cout << "Error in Uploads directive" << std::endl;
-        return 1;
-    }
-    struct stat slatt;
-    if (!stat(s[1].c_str(), &slatt) && S_ISDIR(slatt.st_mode)){
-        _uploadsPath = s[1];
-    }else{
-        std::cout << "Error in Uploads path" << std::endl;
-        return 1;
-    }
-    return 0;
-} 
-
 
 std::string Server::getIndex(){
     return _index;

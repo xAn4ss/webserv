@@ -182,10 +182,6 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             if (serv.setMethods(splitIt(*i, s), s))
                 return 1;
             i++;
-        }else if(!strncmp("Uploads", (*i).c_str(), 7)){
-            if (serv.setUploadsPath(splitIt(*i, s), s))
-                return 1;
-            i++;
         }
         else if (!strncmp((*i).c_str(), "location", 8) &&
          (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*(*i).rbegin()) == '{')))

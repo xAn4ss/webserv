@@ -12,7 +12,9 @@ ServLocation::ServLocation(){
 }
 
 
-
+std::string ServLocation::getLocationCgiPath(){
+    return _cgi_path;
+}
 
 int ServLocation::setLocationMethods(std::string *method, int &size){
     if (size < 2){

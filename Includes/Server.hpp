@@ -23,7 +23,6 @@ private:
     std::string                 _error_path;
     std::vector<std::string>    _server_name;
     std::map<std::string, int>  _methods;
-    std::string                 _uploadsPath;
     // std::map<std::string, std::string> root_index;
 
 
@@ -38,7 +37,6 @@ public:
     int setError(std::string *s, int& size);
     int setIndex(std::string *s, int& size);
     int setAutoIndex(std::string *s, int& size);
-    int setUploadsPath(std::string *, int&);
     void addLocation(ServLocation loc);
     void printPorts();
     std::vector<ServLocation>* getLocations();
@@ -48,7 +46,6 @@ public:
     int checkServ();
     std::vector<int> getPorts();
     std::string getIndex();
-    std::string getUploadPath();
     std::string getRoot();
     std::string getErrorPath();
     std::map<std::string, int> getMethods();
