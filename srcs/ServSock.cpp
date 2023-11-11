@@ -144,10 +144,13 @@ void ServSock::buildResponse(int n, Response &rsp, Request rqst)
         std::cout << ">>>>> " << rsp.get_request() << std::endl;
         return;
     }
+    // pdf/xml png/jpg/jpeg 
     if ((file.length() - file.find(".css")) == 4)
         rsp + "Content-Type: text/css\n";
     else if ((file.length() - file.find(".html")) == 5)
         rsp + "Content-Type: text/html\n";
+    // else if ((file.length() - file.find(".pdf")) == 4)
+    //     rsp + "Content-Type: application/"
     else if ((file.length() - file.find(".jpeg")) == 5)
     {
         chunked = 1;
@@ -296,8 +299,9 @@ void ServSock::processConnection(int n)
                             dup2(inputpipe[0], 0);
                             dup2(outputpipe[1], 1);
                             //execute CGI script
-                            std::string cgi_path = tmp->getLocationCgiFile();
-                            char *cpath[] = {const_cast<char *>(cgi_path.c_str()), NULL};
+                            std::string cgi_path =  "/home/an4ss/Desktop/webserv_saved/"+tmp->getLocationCgiFile();
+                            
+                            char *cpath[] = {const_cast<char*>("/home/an4ss/Desktop/webserv_saved/cgi-bin/php-cgi"),const_cast<char *>(cgi_path.c_str()), NULL};
                             std::cerr << "CGI PATH : " << cgi_path << std::endl;
                             std::cerr << "dkhl hna \n" << std::endl;
                             std::cerr << "CGI PATH : " << cgi_path << std::endl;
@@ -307,7 +311,10 @@ void ServSock::processConnection(int n)
                             for (int i = 0; env_var[i] != NULL; ++i) {
                                 std::cerr << "env[" << i << "]: " << env_var[i] << std::endl;
                             }
-                            if (execve("/mnt/c/Users/Rc/Desktop/web/cgi-bin/php-cgi",cpath, env_var) == -1)
+                            for (int i = 0; cpath[i] != NULL; ++i) {
+                                std::cerr << "cpath[" << i << "]: " << cpath[i] << std::endl;
+                            }
+                            if (execve(cpath[0],cpath, env_var) == -1)
                             {
                             // to be modified
                             perror("execvp");
