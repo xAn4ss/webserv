@@ -1,4 +1,3 @@
-
 #include "./Handler.hpp"
 #include "../Includes/Request.hpp"
 
@@ -21,4 +20,4 @@ Handler::Handler(Request request){
 //     }else if(this->request.get_method() == "DELETE"){
 //         std::cout << "DELETE METHOD !" << std::endl;
 //     }
-// }
+// 

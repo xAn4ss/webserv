@@ -5,8 +5,11 @@ void Response::operator+(std::string s){
 }
 
 
-std::string Response::get_request(){
+std::string Response::get_response(){
     return data;
+}
+void Response::set_response(std::string data){
+    this->data = data;
 }
 
 void Response::set_status(int code){

@@ -86,6 +86,7 @@ Server::Server(/* args */)
     _methods.insert(std::make_pair("DELETE", 1));
     _isAutoIndex = false;
     _index = "";
+    _uploadsPath = "/tmp/uploads/";
 }
 
 void Server::addLocation(ServLocation loc){
@@ -236,6 +237,24 @@ int Server::setRoot(std::string *s, int& size)
         return 1;
     }
     _root = s[1];
+    return 0;
+}
+
+std::string Server::getUploadPath(){
+    return _uploadsPath;
+}
+int Server::setUploadsPath(std::string *s, int& size){
+    if (size != 2)
+    {
+        std::cout << "error in uploads path directive." << std::endl;
+        return 1;
+    }
+    if (!opendir(s[1].c_str()))
+    {
+        std::cout << "error in uploads path." << std::endl;
+        return 1;
+    }
+    _uploadsPath = s[1];
     return 0;
 }
 

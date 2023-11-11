@@ -13,7 +13,8 @@ public:
     ~Response();
     int get_status();
     void set_status(int code);
-    std::string get_request();
+    std::string get_response();
+    void set_response(std::string data);
     void BuildResponse(Request rqst, std::string file);
     void setResponseContentType(std::string file);    
     void operator+(std::string);
