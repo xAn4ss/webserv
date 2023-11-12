@@ -45,7 +45,6 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
     vecEnv.push_back(std::string("SCRIPT_FILENAME=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
     vecEnv.push_back(std::string("PATH_TRANSLATED=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
     vecEnv.push_back(std::string("PATH_INFO=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
-    //vecEnv.push_back(std::string("QUERY_STRING=") );
     if (headerFields.find("Content-Type") != headerFields.end())
         vecEnv.push_back(std::string("CONTENT-TYPE=") + headerFields["Content-Type"]);
     if (headerFields.find("Content-Length") != headerFields.end())
@@ -60,6 +59,7 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
     std::cerr << "script file name =" << (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile() << std::endl;
     std::cerr << "script name =" << (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiPath() << std::endl;
     
+    vecEnv.push_back(std::string("QUERY_STRING=") );
     // Example: Add REQUEST_METHOD
     vecEnv.push_back(std::string("REQUEST_METHOD=") + rqt.get_method()); // Assuming it's a GET request
 

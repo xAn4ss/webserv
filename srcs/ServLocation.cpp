@@ -212,7 +212,7 @@ int ServLocation::setLocationCgiPath(std::string *s, int& size){
         return 1;
     }
     struct stat slatt;
-    if (!stat(s[1].c_str(), &slatt) && S_ISDIR(slatt.st_mode))
+    if (!stat(s[1].c_str(), &slatt))
         _cgi_path = s[1];
     else
     {

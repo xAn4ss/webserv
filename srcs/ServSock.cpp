@@ -314,9 +314,16 @@ void ServSock::processConnection(int n)
                             //execute CGI script
                             //std::string cgi_path =  "/home/an4ss/Desktop/webserv_saved/"+tmp->getLocationCgiFile();
                             //char *cpath[] = {const_cast<char*>("/home/an4ss/Desktop/webserv_saved/cgi-bin/php-cgi"),const_cast<char *>(cgi_path.c_str()), NULL};
-                            std::string cgi_path =  "/mnt/c/Users/Rc/Desktop/newWeb/"+tmp->getLocationCgiFile();
-                            char *cpath[] = {const_cast<char*>("/mnt/c/Users/Rc/Desktop/newWeb/cgi-bin/php-cgi"),const_cast<char *>(cgi_path.c_str()), NULL};
-                            
+                            char wor[256];
+                            getcwd(wor, 256);
+                            std::string cgi_path = wor;
+                            std::string script_path = wor;
+                            cgi_path += "/";
+                            cgi_path += tmp->getLocationCgiFile();
+                            script_path += "/"; 
+                            script_path += tmp->getLocationCgiPath();
+                            std::cerr << ">>>>>>>>>>>>CGI PATH : " << cgi_path << std::endl;
+                            char *cpath[] = {const_cast<char*>(script_path.c_str()),const_cast<char *>(cgi_path.c_str()), NULL};
                             //std::cerr << "CGI PATH : " << cgi_path << std::endl;
                             //std::cerr << "dkhl hna \n" << std::endl;
                             //std::cerr << "CGI PATH : " << cgi_path << std::endl;

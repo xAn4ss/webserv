@@ -74,6 +74,7 @@ int Webserv::startSockets(){
     int isEnd = 0;
     std::string finalReq; 
     while (true) {
+
         FD_ZERO(&port_fd);
         for (int i = 0; i < servSock.size(); i++){
             FD_SET(servSock[i].first.get_socket(), &port_fd);
@@ -83,6 +84,7 @@ int Webserv::startSockets(){
             perror("select error:");
             return -1;
         }
+                    std::cout << "ouiuyoiuyiuyuth"<< std::endl;
         for (int i = 0; i < servSock.size(); i++){
             if (FD_ISSET(servSock[i].first.get_socket() , &port_fd))
             {
@@ -97,7 +99,6 @@ int Webserv::startSockets(){
                     max_fd = std::max(max_fd, new_sock.get_socket());
                 }else{
                     char buf[1024];
-                    // std::cout << "reading from  : " << servSock[i].first.get_socket() << std::endl;
                     int rcv = read(servSock[i].first.get_socket(), buf, sizeof(buf));
                     if (rcv < 0)
                     {
@@ -106,8 +107,8 @@ int Webserv::startSockets(){
                     }else if (rcv > 0){
                         buf[rcv] = '\0';
                         //std::string t = buf; 
-                         std::string t(buf, rcv); // added by sami 
-                        //std::cout << "==>" << t << std::endl;
+                        std::string t(buf, rcv); // added by sami 
+                        std::cout << "==>" << t << std::endl;
                         std::string::iterator it = t.begin();
                         size_t x = t.find("\nContent-Length: ");
                         if (!isEnd){
@@ -146,30 +147,6 @@ int Webserv::startSockets(){
                             finalReq.erase(finalReq.begin(), finalReq.end());                  
                             // finalReq.clear();
                         }
-
-
-                        // if (x != std::string::npos)
-                        // {
-                        //         // std::cout << "if ==>>" << t.substr(x+17, t.find_first_not_of("\n",x+1))
-                        //         //     << "..." << std::endl;
-                        //         lenght += header + 4;
-                        //         finalReq.insert(finalReq.begin(), it, it+(rcv-header));
-                        //         lenght -= (rcv);
-                        //         std::cout << "if ==>>" << finalReq << std::endl;
-                        //         finalReq.insert(finalReq.begin() + (int)finalReq.size(), it+header, t.end());
-                        //         lenght -= rcv;
-                        //         std::cout << "if ==>>" << finalReq << std::endl;
-                        // }else{
-                        //     finalReq.insert(finalReq.begin() + (int)finalReq.size(), it+header, t.end());
-                        //     lenght -= rcv;
-                        //     // std::cout << "else ==>>" << finalReq << std::endl;
-
-                        // }
-                        // if (!lenght){
-                        //     servSock[i].first.set_request(finalReq);
-                        //     std::cout << "===>  " << servSock[i].first.get_request() << std::endl;
-                        //     servSock.processConnection(i);
-                        // }
                     }else{
                         std::cout << "~~Disconnected~~" << std::endl;
                         servSock[i].first.close_sock();

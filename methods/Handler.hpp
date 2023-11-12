@@ -48,8 +48,9 @@ int Handler::handleMethod(){
     if(this->request.get_method() == "POST"){
         std::cout << "POST METHOD !" << std::endl;
         std::string content = this->request.get_body();
-
+        std::cout << "content is : " << content << std::endl;
         std::string filepath = this->_uploadPath + this->request.get_file();
+        std::cerr << "@@@@@ REQUEST : " << this->request.get_body() << std::endl;
         std::ofstream outfile(filepath.c_str());
         outfile << content << std::endl;
         outfile.close();
