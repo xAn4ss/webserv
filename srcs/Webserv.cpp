@@ -84,7 +84,7 @@ int Webserv::startSockets(){
             perror("select error:");
             return -1;
         }
-                    std::cout << "ouiuyoiuyiuyuth"<< std::endl;
+        std::cout << "ouiuyoiuyiuyuth"<< std::endl;
         for (int i = 0; i < servSock.size(); i++){
             if (FD_ISSET(servSock[i].first.get_socket() , &port_fd))
             {

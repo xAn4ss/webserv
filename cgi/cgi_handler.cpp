@@ -5,6 +5,7 @@
 std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int n, std::string cgi_path) {
     std::map<std::string, std::string> headerFields;
 
+    std::cerr << "//////////////////POST METHOD !//////////////" << std::endl;
     const std::string& request = rqt.get_header();
     std::cerr << "n=" << n << std::endl;
     std::cerr << "request: " << request << std::endl;
@@ -30,9 +31,9 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
             headerFields[key] = value;
         }
     }
-    for (const auto& pair : headerFields) {
-        std::cerr << pair.first << " $$$ " << pair.second << std::endl;
-    }
+    //for (const auto& pair : headerFields) {
+    //    std::cerr << pair.first << " $$$ " << pair.second << std::endl;
+    //}
     std::cerr << "///////////////////////////////////////" << std::endl;
     // Construct environment variables similar to Response::initEnv
     std::vector<std::string> vecEnv;
@@ -59,17 +60,20 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
     std::cerr << "script file name =" << (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile() << std::endl;
     std::cerr << "script name =" << (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiPath() << std::endl;
     
-    vecEnv.push_back(std::string("QUERY_STRING=") );
     // Example: Add REQUEST_METHOD
     vecEnv.push_back(std::string("REQUEST_METHOD=") + rqt.get_method()); // Assuming it's a GET request
+    //if (headerFields.find("POST") != headerFields.end())
+    //    vecEnv.push_back(std::string("QUERY_STRING="));
 
     // Example: Map Host to SERVER_NAME
     if (headerFields.find("Host") != headerFields.end())
         vecEnv.push_back(std::string("SERVER_NAME=") + headerFields["Host"]);
 
     // Constructing the map of environment variables
-    for (const auto& envVar : vecEnv) {
+    for (std::vector<std::string>::const_iterator it = vecEnv.begin(); it != vecEnv.end(); ++it) {
+        const std::string& envVar = *it;
         size_t pos = envVar.find('=');
+        
         if (pos != std::string::npos) {
             std::string key = envVar.substr(0, pos);
             std::string value = envVar.substr(pos + 1);
@@ -78,9 +82,9 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
     }
     std::cerr << "///////////***************///////////////" << std::endl;
     std::cerr << "###################Environment Variables:################" << std::endl;
-    for (const auto& pair : environmentVariables) {
-        std::cerr << pair.first << " = " << pair.second << std::endl;
-    }
+    //for (const auto& pair : environmentVariables) {
+    //    std::cerr << pair.first << " = " << pair.second << std::endl;
+    //}
 
     return environmentVariables;
 }

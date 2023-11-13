@@ -200,6 +200,7 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             if (location.processLocation(begin, i))
                 return 1;
             i++;
+            std::cout << "---m " << location.getLocationIsCgi() << std::endl;
             //push servLocation in location vector
             serv.addLocation(location);
 

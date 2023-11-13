@@ -8,7 +8,6 @@
 #include <cstring>
 #include <iostream>
 
-std::map<std::string, std::string> parseRequestHeader(const std::string& request);
 char** convertToEnvp(const std::map<std::string, std::string>& requestMap);
 
 #endif

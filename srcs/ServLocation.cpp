@@ -203,6 +203,8 @@ int ServLocation::setLocationPath(std::string s)
 }
 
 bool ServLocation::getLocationIsCgi(){
+                std::cout << "////////////////// "<< _isCgi <<"  //////////////" << std::endl;
+
     return _isCgi;
 }
 
@@ -212,14 +214,17 @@ int ServLocation::setLocationCgiPath(std::string *s, int& size){
         return 1;
     }
     struct stat slatt;
-    if (!stat(s[1].c_str(), &slatt))
+    if (!stat(s[1].c_str(), &slatt)){
         _cgi_path = s[1];
+        _isCgi = true;
+    }
     else
     {
         std::cout << "error in Location cgi path (path inexistant)" << std::endl;
         return 1;
     }
-    _isCgi = true;
+
+    std::cerr << "/// DAZ MN HNA  ///" << _isCgi << std::endl;
     return 0;
 }
 

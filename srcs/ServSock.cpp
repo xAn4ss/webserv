@@ -460,7 +460,7 @@ void ServSock::processConnection(int n)
     }
     else
     {
-        Handler handler(rqst, servSock[n].second.getUploadPath());
+        Handler handler(rqst, (*this), n);
         int status = handler.handleMethod();
         std::string response = "";
         if(status == 201){
