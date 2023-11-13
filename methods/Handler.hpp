@@ -51,13 +51,9 @@ void deleteFileOrDirectory(const std::string& path) {
 int Handler::handleMethod(){
     // POST METHOD
     if(this->request.get_method() == "POST"){
-                std::cout << "//////////////////POST METHOD !//////////////" << std::endl;
-        ServLocation tmp = *servSock[m].second.getLocation(request.get_file());
-        
-        std::cout << "////////////////// MORA METHOD !//////////////" << std::endl;
-                //std::cout << "////////////////// MORA "<< servSock[m].second.getLocation(request.get_file())->getLocationIsCgi()<<" METHOD !//////////////" << std::endl;
-        if (tmp.getLocationIsCgi() == true){
-            std::string cgiPath = tmp.getLocationCgiPath();
+        ServLocation* tmp = servSock[m].second.getLocation(request.get_file().substr(1));
+        if (tmp->getLocationIsCgi() == true){
+            std::string cgiPath = tmp->getLocationCgiPath();
             std::string content = this->request.get_body();
 
             //EXECUTE CGI SCRIPT
@@ -89,9 +85,9 @@ int Handler::handleMethod(){
                 std::string cgi_path = wor;
                 std::string script_path = wor;
                 cgi_path += "/";
-                cgi_path += tmp.getLocationCgiFile();
+                cgi_path += tmp->getLocationCgiFile();
                 script_path += "/"; 
-                script_path += tmp.getLocationCgiPath();
+                script_path += tmp->getLocationCgiPath();
                 char *argv[] = {(char *)cgi_path.c_str(), (char *)script_path.c_str(), NULL};
                 std::map<std::string, std::string> env = servSock.parseRequestHeader(request, m, cgi_path);
 

@@ -1,6 +1,7 @@
 #include "../Includes/ServLocation.hpp"
 
-ServLocation::ServLocation(){
+ServLocation::ServLocation()
+{
     _index = "";
     _isAutoIndex = false;
     _isRedirected = false;
@@ -8,25 +9,28 @@ ServLocation::ServLocation(){
     _methods.insert(std::make_pair("GET", 1));
     _methods.insert(std::make_pair("POST", 1));
     _methods.insert(std::make_pair("DELETE", 1));
-
 }
 
-
-std::string ServLocation::getLocationCgiPath(){
+std::string ServLocation::getLocationCgiPath()
+{
     return _cgi_path;
 }
 
-int ServLocation::setLocationMethods(std::string *method, int &size){
-    if (size < 2){
+int ServLocation::setLocationMethods(std::string *method, int &size)
+{
+    if (size < 2)
+    {
         std::cout << "Error in method directive" << std::endl;
         return 1;
     }
     std::map<std::string, int>::iterator it = _methods.begin();
-    while (it != _methods.end()){
-            int f = 0;
-        for (int i = 1; i < size; i++){
-            if (method[i].compare("GET") && method[i].compare("POST") 
-             && method[i].compare("DELETE")){
+    while (it != _methods.end())
+    {
+        int f = 0;
+        for (int i = 1; i < size; i++)
+        {
+            if (method[i].compare("GET") && method[i].compare("POST") && method[i].compare("DELETE"))
+            {
                 std::cout << "Error in methods syntax." << std::endl;
                 return 1;
             }
@@ -39,7 +43,6 @@ int ServLocation::setLocationMethods(std::string *method, int &size){
             else if (!f && it->first != method[i])
             {
                 it->second = 0;
-
             }
             // std::cout << it->second << std::endl;
         }
@@ -56,35 +59,38 @@ ServLocation::~ServLocation()
 {
 }
 
-
-std::map<std::string, int> ServLocation::getLocationMethods(){
+std::map<std::string, int> ServLocation::getLocationMethods()
+{
     return _methods;
 }
-
 
 bool ServLocation::getLocationAutoIndex()
 {
     return _isAutoIndex;
 }
 
-std::string ServLocation::getLocationIndex(){
-    if(_index.empty())
+std::string ServLocation::getLocationIndex()
+{
+    if (_index.empty())
         return "";
     return _index;
 }
 
-std::string ServLocation::getLocationPath(){
+std::string ServLocation::getLocationPath()
+{
     if (_locationPath.empty())
     {
         return "empty";
     }
     return _locationPath;
 }
-std::string ServLocation::getLocationRoot(){
+std::string ServLocation::getLocationRoot()
+{
     return _root;
 }
 
-std::string* splitIt(std::string s, int & size){
+std::string *splitIt(std::string s, int &size)
+{
     int start = 0;
     int end = 0;
     std::vector<std::string> tmp;
@@ -103,7 +109,8 @@ std::string* splitIt(std::string s, int & size){
     return (line);
 }
 
-int ServLocation::setLocationIndex(std::string* s, int& size){
+int ServLocation::setLocationIndex(std::string *s, int &size)
+{
     if (size != 2)
     {
         std::cout << "missing index page" << std::endl;
@@ -112,7 +119,7 @@ int ServLocation::setLocationIndex(std::string* s, int& size){
     std::string path = _root + s[1];
     if (access(path.c_str(), F_OK) == -1)
     {
-        std::cout << "wrong server index path"<< std::endl;
+        std::cout << "wrong server index path" << std::endl;
         return 1;
     }
     _index = path;
@@ -120,26 +127,39 @@ int ServLocation::setLocationIndex(std::string* s, int& size){
     return 0;
 }
 
-std::string ServLocation::getLocationCgiFile(){
+std::string ServLocation::getLocationCgiFile()
+{
     return _locationPath + _cgi_file;
 }
-std::string ServLocation::getCgiFile(){
+std::string ServLocation::getCgiFile()
+{
     struct dirent *dir;
-    DIR *d = opendir(_locationPath.c_str());
-    std::string cgiFile; 
+    char s[1042];
+    std::string path;
+    if (_locationPath == "/")
+        path = getcwd(s, sizeof(s));
+    else
+        path = _locationPath;
+    DIR *d = opendir(path.c_str());
+    std::string cgiFile;
     while ((dir = readdir(d)) != NULL)
     {
         std::string cont;
         cont = dir->d_name;
-        for (size_t i = 0; i < _cgi_execs.size(); i++){
-            if (cont.find(_cgi_execs[i]) != std::string::npos)
+        for (size_t i = 0; i < _cgi_execs.size(); i++)
+        {
+            if (cont.find(_cgi_execs[i]) != std::string::npos){
+                std::cout << "====>" << cont << std::endl;
                 return cont;
+            }
         }
     }
+    // if ()
     return "";
 }
 
-int ServLocation::setLocationRoot(std::string* s, int& size){
+int ServLocation::setLocationRoot(std::string *s, int &size)
+{
     if (size != 2)
     {
         std::cout << " error in Location \"" << _locationPath << "\" root directive." << std::endl;
@@ -154,22 +174,29 @@ int ServLocation::setLocationRoot(std::string* s, int& size){
     return 0;
 }
 
-int isAllDigit(std::string s){
-    for( size_t i = 0; i < s.size(); i++){
+int isAllDigit(std::string s)
+{
+    for (size_t i = 0; i < s.size(); i++)
+    {
         if (!isdigit(s[i]))
             return 1;
     }
     return 0;
 }
 
-int ServLocation::setLocationIsRedirect(std::string *s, int& size){
-    if (size != 3){
+int ServLocation::setLocationIsRedirect(std::string *s, int &size)
+{
+    if (size != 3)
+    {
         std::cout << "Error in redirection direcive" << std::endl;
         return 1;
     }
-    if (!isAllDigit(s[1])){
+    if (!isAllDigit(s[1]))
+    {
         _Redir_code = s[1];
-    }else{
+    }
+    else
+    {
         std::cout << "Error in redirection code " << std::endl;
         return 1;
     }
@@ -178,7 +205,8 @@ int ServLocation::setLocationIsRedirect(std::string *s, int& size){
     return 0;
 }
 
-int ServLocation::setLocationAutoIndex(std::string *s, int& size){
+int ServLocation::setLocationAutoIndex(std::string *s, int &size)
+{
     if (size != 2)
     {
         std::cout << "error in Location autoIndex directive." << std::endl;
@@ -202,19 +230,23 @@ int ServLocation::setLocationPath(std::string s)
     return 0;
 }
 
-bool ServLocation::getLocationIsCgi(){
-                std::cout << "////////////////// "<< _isCgi <<"  //////////////" << std::endl;
+bool ServLocation::getLocationIsCgi()
+{
+    std::cout << "////////////////// " << _isCgi << "  //////////////" << std::endl;
 
     return _isCgi;
 }
 
-int ServLocation::setLocationCgiPath(std::string *s, int& size){
-    if (size != 2){
+int ServLocation::setLocationCgiPath(std::string *s, int &size)
+{
+    if (size != 2)
+    {
         std::cout << "error in Location cgi path" << std::endl;
         return 1;
     }
     struct stat slatt;
-    if (!stat(s[1].c_str(), &slatt)){
+    if (!stat(s[1].c_str(), &slatt))
+    {
         _cgi_path = s[1];
         _isCgi = true;
     }
@@ -228,14 +260,17 @@ int ServLocation::setLocationCgiPath(std::string *s, int& size){
     return 0;
 }
 
-std::vector<std::string>* ServLocation::getLocationCgiExecs(){
+std::vector<std::string> *ServLocation::getLocationCgiExecs()
+{
     if (_cgi_execs.empty())
         return NULL;
-    return &_cgi_execs;   
+    return &_cgi_execs;
 }
 
-int ServLocation::setLocationCgiExec(std::string *s, int& size){
-    if (size < 2 || size > 3){
+int ServLocation::setLocationCgiExec(std::string *s, int &size)
+{
+    if (size < 2 || size > 3)
+    {
         std::cout << "error in location cgi execs" << std::endl;
         return 1;
     }
@@ -249,36 +284,41 @@ int ServLocation::setLocationCgiExec(std::string *s, int& size){
         _cgi_execs.push_back(s[i]);
     }
     _cgi_file = getCgiFile();
-    if (_cgi_file.empty()){
+    if (_cgi_file.empty())
+    {
         std::cout << "Error in cgi file" << std::endl;
         return 1;
     }
     return 0;
 }
-bool ServLocation::getLocationIsRedirected(){
+bool ServLocation::getLocationIsRedirected()
+{
     return _isRedirected;
 }
 
-int ServLocation::getLocationRedirCode(){
+int ServLocation::getLocationRedirCode()
+{
     std::istringstream iss(_Redir_code);
     int code;
     iss >> code;
     return code;
 }
 
-std::string ServLocation::getLocationRedirPath(){
+std::string ServLocation::getLocationRedirPath()
+{
     return _redirected_to;
 }
-int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::vector<std::string>::iterator end){
+int ServLocation::processLocation(std::vector<std::string>::iterator begin, std::vector<std::string>::iterator end)
+{
     std::vector<std::string> lct(begin, end);
     // std::cout << "-* "<<(*begin).substr((*begin).find_first_of(" \t")+1,
     // ((*begin).size()- (*begin).find_last_not_of("{ \t"))) << std::endl;
 
     int b = (*begin).find_first_of(" \t") + 1;
-    int e = (*begin).find_last_not_of("{ \t") ;
+    int e = (*begin).find_last_not_of("{ \t");
 
     // std::cout << b <<" *-* " << e << " **" << (*begin).substr(b, e + 1 -b) <<".."<<std::endl;
-    if (setLocationPath((*begin).substr(b, e + 1 -b)))
+    if (setLocationPath((*begin).substr(b, e + 1 - b)))
         return 1;
     int size;
     begin++;
@@ -287,35 +327,45 @@ int ServLocation::processLocation(std::vector<std::string>::iterator begin,std::
     while (begin != end)
     {
         size = 0;
-        if (!strncmp((*begin).c_str(), "root", 4)){
+        if (!strncmp((*begin).c_str(), "root", 4))
+        {
             if (setLocationRoot(splitIt(*begin, size), size))
                 return 1;
-        }else if (!strncmp((*begin).c_str(), "index", 5)){
+        }
+        else if (!strncmp((*begin).c_str(), "index", 5))
+        {
             if (setLocationIndex(splitIt((*begin).c_str(), size), size))
                 return 1;
-        }else if (!strncmp((*begin).c_str(), "autoIndex", 9)){
+        }
+        else if (!strncmp((*begin).c_str(), "autoIndex", 9))
+        {
             if (setLocationAutoIndex(splitIt((*begin).c_str(), size), size))
                 return 1;
         }
-        else if (!strncmp((*begin).c_str(), "method",6)){
+        else if (!strncmp((*begin).c_str(), "method", 6))
+        {
             if (setLocationMethods(splitIt((*begin).c_str(), size), size))
                 return 1;
-        }else if (!strncmp((*begin).c_str(), "cgi_path", 8)){
-            if (setLocationCgiPath(splitIt((*begin).c_str(), size), size))
-                return 1;   
-        }else if (!strncmp((*begin).c_str(), "cgi_exec", 8)){
-            if (setLocationCgiExec(splitIt((*begin).c_str(), size), size))
-                return 1;   
-        }else if (!strncmp((*begin).c_str(), "return", 6)){
-            if (setLocationIsRedirect(splitIt((*begin).c_str(), size), size))
-                return 1;   
         }
-        
+        else if (!strncmp((*begin).c_str(), "cgi_path", 8))
+        {
+            if (setLocationCgiPath(splitIt((*begin).c_str(), size), size))
+                return 1;
+        }
+        else if (!strncmp((*begin).c_str(), "cgi_exec", 8))
+        {
+            if (setLocationCgiExec(splitIt((*begin).c_str(), size), size))
+                return 1;
+        }
+        else if (!strncmp((*begin).c_str(), "return", 6))
+        {
+            if (setLocationIsRedirect(splitIt((*begin).c_str(), size), size))
+                return 1;
+        }
+
         // std::cout << *begin << std::endl;
         begin++;
     }
-
-
 
     return 0;
 }

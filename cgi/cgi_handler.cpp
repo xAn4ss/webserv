@@ -5,7 +5,8 @@
 std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int n, std::string cgi_path) {
     std::map<std::string, std::string> headerFields;
 
-    std::cerr << "//////////////////POST METHOD !//////////////" << std::endl;
+    std::cerr << "=====>>"<< rqt.get_file() << std::endl;
+
     const std::string& request = rqt.get_header();
     std::cerr << "n=" << n << std::endl;
     std::cerr << "request: " << request << std::endl;
@@ -31,21 +32,26 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
             headerFields[key] = value;
         }
     }
-    //for (const auto& pair : headerFields) {
+    // std::cerr << "///////////////////////////////////////" << std::endl;
+    // for (const auto& pair : headerFields) {
     //    std::cerr << pair.first << " $$$ " << pair.second << std::endl;
-    //}
-    std::cerr << "///////////////////////////////////////" << std::endl;
+    // }
+    // std::cerr << "///////////////////////////////////////" << std::endl;
     // Construct environment variables similar to Response::initEnv
     std::vector<std::string> vecEnv;
+    char wor[256];
     
+    std::string path = getcwd(wor, 256);
     if (headerFields.find("Accept") != headerFields.end())
         vecEnv.push_back(std::string("HTTP_ACCEPT=") + headerFields["Accept"]);
     // Add more environment variables similarly for other fields as in the initEnv function
+
     vecEnv.push_back(std::string("SERVER_PROTOCOL=HTTP/1.1"));
-    vecEnv.push_back(std::string("SCRIPT_NAME=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiPath());
-    vecEnv.push_back(std::string("SCRIPT_FILENAME=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
-    vecEnv.push_back(std::string("PATH_TRANSLATED=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
-    vecEnv.push_back(std::string("PATH_INFO=") + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
+    vecEnv.push_back(std::string("SCRIPT_NAME=") + path + "/" + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiPath());
+    vecEnv.push_back(std::string("SCRIPT_FILENAME=") + path + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
+    std::cerr << "//////////////////POST METHOD !//////////////" << std::endl;
+    vecEnv.push_back(std::string("PATH_TRANSLATED=") + path + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
+    vecEnv.push_back(std::string("PATH_INFO=") + path + (*servSock[n].second.getLocation(rqt.get_file())).getLocationCgiFile());
     if (headerFields.find("Content-Type") != headerFields.end())
         vecEnv.push_back(std::string("CONTENT-TYPE=") + headerFields["Content-Type"]);
     if (headerFields.find("Content-Length") != headerFields.end())
@@ -80,11 +86,11 @@ std::map<std::string, std::string> ServSock::parseRequestHeader(Request rqt, int
             environmentVariables[key] = value;
         }
     }
-    std::cerr << "///////////***************///////////////" << std::endl;
     std::cerr << "###################Environment Variables:################" << std::endl;
-    //for (const auto& pair : environmentVariables) {
-    //    std::cerr << pair.first << " = " << pair.second << std::endl;
-    //}
+    for (const auto& pair : environmentVariables) {
+       std::cerr << pair.first << " = " << pair.second << std::endl;
+    }
+    std::cerr << "///////////***************///////////////" << std::endl;
 
     return environmentVariables;
 }

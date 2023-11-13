@@ -44,7 +44,6 @@ int Request::parse(std::string req){
     r >> method;
     r >> file;
     r >> http_v;
-    
     header = req.substr(0, req.find("\r\n\r\n"));
     // parse request body 
     std::size_t bodyIndex = req.find("\r\n\r\n");
@@ -53,7 +52,7 @@ int Request::parse(std::string req){
         body = req.substr(bodyIndex);
     } 
     this->body = body;
-    std::cerr << "HEADER:\n" <<  this->header << std::endl;
+    // std::cerr << "HEADER:\n" <<  this->header << std::endl;
     return 0;
 }
 

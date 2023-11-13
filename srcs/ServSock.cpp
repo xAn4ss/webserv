@@ -137,18 +137,34 @@ void setContentLength(Response &rsp, std::string &chunkedData, std::string file)
 void ServSock::buildResponse(int n, Response &rsp, Request rqst)
 {
     chunked = 0;
-    if (servSock[n].second.getLocation(rqst.get_file()) != NULL )
+    std::cout << "====>>" << rqst.get_file() << std::endl;
+    if (servSock[n].second.getLocation(rqst.get_file()) != NULL)
     {
         ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
+        
         if (tmp->getLocationIsCgi()){
             std::string cgi = rsp.get_response();
-        std::cout << "*/*/*/*/*/*"<< cgi <<"/*/**/*/**/*/" << std::endl;
+            std::cout << "*/*/*/*/*/*"<< cgi <<"/*/**/*/**/*/" << std::endl;
             rsp.set_response("");
             buildHead(n, rsp, rqst);
             rsp + cgi;
         }
         return;
 
+    }
+    struct stat slatt;
+    if (!stat(rqst.get_file().c_str(), &slatt) && !S_ISDIR(slatt.st_mode)){
+        if (servSock[n].second.getLocation(rqst.get_file()) == NULL )
+            rqst.setFile("/");
+        ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
+        if (tmp->getLocationIsCgi()){
+            std::string cgi = rsp.get_response();
+        std::cout << "==========="<< cgi << "============" << std::endl;
+            rsp.set_response("");
+            buildHead(n, rsp, rqst);
+            rsp + cgi;
+        }
+        return;
     }
     buildHead(n, rsp, rqst);
     if ((rsp.get_status() / 100) == 3)
@@ -160,9 +176,17 @@ void ServSock::buildResponse(int n, Response &rsp, Request rqst)
     if ((file.length() - file.find(".css")) == 4)
         rsp + "Content-Type: text/css\n";
     else if ((file.length() - file.find(".html")) == 5)
-        rsp + "Content-Type: text/html\n";
-    // else if ((file.length() - file.find(".pdf")) == 4)
-    //     rsp + "Content-Type: application/"
+        rsp + "Content-Type: text/html\n";   
+    else if ((file.length() - file.find(".js")) == 3){
+        chunked = 1;
+        rsp + "Content-Type: application/javascript";
+        setContentLength(rsp, chunkedData, file);
+    }
+    else if ((file.length() - file.find(".pdf")) == 4){
+        chunked = 1;
+        rsp + "Content-Type: application/pdf";
+        setContentLength(rsp, chunkedData, file);
+    }
     else if ((file.length() - file.find(".jpeg")) == 5)
     {
         chunked = 1;
@@ -180,7 +204,8 @@ void ServSock::buildResponse(int n, Response &rsp, Request rqst)
         chunked = 1;
         rsp + "Content-Type: video/mp4\r\n";
         setContentLength(rsp, chunkedData, file);
-    }
+    }else
+        rsp + "Content-Type: text/plain\n";
     // Not chunked request
     if (!chunked)
     {
@@ -418,8 +443,98 @@ void ServSock::processConnection(int n)
                         rsp.set_status(501);
                     else
                     {
-                        file = rqst.get_file();
-                        rsp.set_status(200);
+                        ServLocation *tmp = servSock[n].second.getLocation("/");
+                        if (servSock[n].second.getLocation("/")->getLocationIsCgi() == true){
+                            std::cout << "-*-*-*-*-*-*-*-*-*-" << std::endl;
+                        int inputpipe[2];
+                        int outputpipe[2];
+                        if (pipe(inputpipe) == -1 || pipe(outputpipe) == -1){
+                            std::cerr << "failed to open pipes" << std::endl;
+                            return;
+                        }
+
+
+                        pid_t child_pid = fork();
+                        if (child_pid == -1){
+                            std::cerr << "Forking failed" << std::endl;
+                            return ;
+                        }
+                        else if (child_pid == 0){
+                            close(inputpipe[1]);
+                            close(outputpipe[0]);
+
+                            dup2(inputpipe[0], 0);
+                            dup2(outputpipe[1], 1);
+                            //execute CGI script
+                            //std::string cgi_path =  "/home/an4ss/Desktop/webserv_saved/"+tmp->getLocationCgiFile();
+                            //char *cpath[] = {const_cast<char*>("/home/an4ss/Desktop/webserv_saved/cgi-bin/php-cgi"),const_cast<char *>(cgi_path.c_str()), NULL};
+                            char wor[256];
+                            getcwd(wor, 256);
+                            std::string cgi_path = wor;
+                            std::string script_path = wor;
+                            cgi_path += tmp->getLocationCgiFile();
+                            script_path += "/" + tmp->getLocationCgiPath();
+                            std::cerr << ">>>>>>>>>>>>CGI PATH : " << cgi_path << std::endl;
+                            std::cerr << ">>>>>>>>>>>>rqst file : " << rqst.get_file() << std::endl;
+                            char *cpath[] = {const_cast<char*>(script_path.c_str()),const_cast<char *>(cgi_path.c_str()), NULL};
+                            //std::cerr << "CGI PATH : " << cgi_path << std::endl;
+                            //std::cerr << "dkhl hna \n" << std::endl;
+                            //std::cerr << "CGI PATH : " << cgi_path << std::endl;
+                            rqst.setFile("/");
+                            std::map<std::string, std::string> requestMap = parseRequestHeader(rqst, n, cgi_path);
+                            //std::cerr << "hnna hnaaaaaaaaaaaaaaa" << std::endl;
+                            char** env_var = convertToEnvp(requestMap);//convert parsed request
+                            for (int i = 0; env_var[i] != NULL; ++i) {
+                               std::cerr << "==>" << "env[" << i << "]: " << env_var[i] << std::endl;
+                            }
+                            for (int i = 0; cpath[i] != NULL; ++i) {
+                                std::cerr << "cpath[" << i << "]: " << cpath[i] << std::endl;
+                            }
+                            if (execve(cpath[0],cpath, env_var) == -1)
+                            {
+                            // to be modified
+                            perror("execvp");
+                            return ;
+                            }
+                            std::cerr << "###########################" << std::endl;
+                            exit(1);
+                        }else {
+                            //in parent process
+                            close(inputpipe[0]);
+                            close(outputpipe[1]);
+
+                            //Debugging ended here
+                            write(inputpipe[1], servSock[n].first.get_request().c_str(), servSock[n].first.get_request().size());
+                            close(inputpipe[1]);
+                            rsp.set_status(200);
+                            char buf[1024];
+                            ssize_t bytes;
+                            std::string cgi_response;
+                            while ((bytes = read(outputpipe[0], buf, sizeof(buf))) > 0)
+                            {
+                                cgi_response.append(buf, bytes);
+                                //handle CGI script, senf it as HTTP response
+                            }
+                            close(outputpipe[0]);
+                            std::string httpResponse;
+                            //httpResponse += "Content-Type: text/html\r\n";
+                            //httpResponse += "Content-Length: " + std::to_string(cgiOutput.size()) + "\r\n";
+                            //httpResponse += "\r\n";
+                            httpResponse += cgi_response;
+                            ///+/ For demonstration, you can send the HTTP response to the client or display it
+                            std::cerr << "HTTPS RESPONSE ====" << std::endl;
+                            std::cerr << httpResponse << std::endl;
+                            std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+                            rsp + httpResponse;
+                            buildResponse(n, rsp, rqst);
+                            
+                            std::cerr << rsp.get_response() << std::endl;
+                        }
+
+                        }else{
+                            file = rqst.get_file();
+                            rsp.set_status(200);
+                        }
                     }
                 }
             }
@@ -449,7 +564,9 @@ void ServSock::processConnection(int n)
                     rsp.set_status(200);
                 }
                 else
+                {
                     rsp.set_status(404);
+                }
             }
         }
         if (!autIndexed)
