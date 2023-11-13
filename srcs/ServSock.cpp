@@ -119,7 +119,7 @@ void ServSock::buildHead(int n, Response &rsp, Request rqst)
     }
 }
 
-void setContentLength(Response &rsp, std::string &chunkedData, std::string file)
+void setContentLength(Response &rsp, std::string &chunkedData, std::string file, int size)
 {
     std::ifstream s(file.c_str(), std::ios::binary);
     std::vector<char> vec;
@@ -131,40 +131,56 @@ void setContentLength(Response &rsp, std::string &chunkedData, std::string file)
     s.close();
     std::ostringstream len;
     len << (int)tmp.size();
-    rsp + ("Content-Length: " + len.str() + "\r\n\r\n");
+    if (size != -1)
+    {   size *= 1000;
+        chunkedData.substr(0, size) ;
+        std::stringstream s;
+        s << (size*1000);
+        rsp + ("Content-Length: " + s.str() + "\r\n\r\n");
+
+    }else
+        rsp + ("Content-Length: " + len.str() + "\r\n\r\n");
 }
 
 void ServSock::buildResponse(int n, Response &rsp, Request rqst)
 {
     chunked = 0;
     std::cout << "====>>" << rqst.get_file() << std::endl;
+    struct stat slatt;
+    if (!stat(rqst.get_file().c_str(), &slatt)){
+        if (S_ISDIR(slatt.st_mode)){
+
+        }else{
+            
+        }
+
+    }
     if (servSock[n].second.getLocation(rqst.get_file()) != NULL)
     {
         ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
-        
+
         if (tmp->getLocationIsCgi()){
             std::string cgi = rsp.get_response();
             std::cout << "*/*/*/*/*/*"<< cgi <<"/*/**/*/**/*/" << std::endl;
             rsp.set_response("");
             buildHead(n, rsp, rqst);
             rsp + cgi;
+            return;
         }
-        return;
 
     }
-    struct stat slatt;
     if (!stat(rqst.get_file().c_str(), &slatt) && !S_ISDIR(slatt.st_mode)){
         if (servSock[n].second.getLocation(rqst.get_file()) == NULL )
             rqst.setFile("/");
         ServLocation *tmp = servSock[n].second.getLocation(rqst.get_file());
         if (tmp->getLocationIsCgi()){
             std::string cgi = rsp.get_response();
-        std::cout << "==========="<< cgi << "============" << std::endl;
+            std::cout << "==========="<< cgi << "============" << std::endl;
             rsp.set_response("");
             buildHead(n, rsp, rqst);
             rsp + cgi;
+            return;
         }
-        return;
     }
     buildHead(n, rsp, rqst);
     if ((rsp.get_status() / 100) == 3)
@@ -180,30 +196,30 @@ void ServSock::buildResponse(int n, Response &rsp, Request rqst)
     else if ((file.length() - file.find(".js")) == 3){
         chunked = 1;
         rsp + "Content-Type: application/javascript";
-        setContentLength(rsp, chunkedData, file);
+        setContentLength(rsp, chunkedData, file, servSock[n].second.getClientMaxBodySize());
     }
     else if ((file.length() - file.find(".pdf")) == 4){
         chunked = 1;
         rsp + "Content-Type: application/pdf";
-        setContentLength(rsp, chunkedData, file);
+        setContentLength(rsp, chunkedData, file, servSock[n].second.getClientMaxBodySize());
     }
     else if ((file.length() - file.find(".jpeg")) == 5)
     {
         chunked = 1;
         rsp + "Content-Type: image/jpeg\r\n";
-        setContentLength(rsp, chunkedData, file);
+        setContentLength(rsp, chunkedData, file, servSock[n].second.getClientMaxBodySize());
     }
     else if ((file.length() - file.find(".png")) == 4)
     {
         chunked = 1;
         rsp + "Content-Type: image/png\r\n";
-        setContentLength(rsp, chunkedData, file);
+        setContentLength(rsp, chunkedData, file, servSock[n].second.getClientMaxBodySize());
     }
     else if ((file.length() - file.find(".mp4")) == 4)
     {
         chunked = 1;
         rsp + "Content-Type: video/mp4\r\n";
-        setContentLength(rsp, chunkedData, file);
+        setContentLength(rsp, chunkedData, file, servSock[n].second.getClientMaxBodySize());
     }else
         rsp + "Content-Type: text/plain\n";
     // Not chunked request
@@ -219,7 +235,13 @@ void ServSock::buildResponse(int n, Response &rsp, Request rqst)
         }
         std::ostringstream tmp;
         tmp << (int)fileContent.length();
-        rsp + ("Content-Length: " + tmp.str() + "\r\n\r\n");
+        if (servSock[n].second.getClientMaxBodySize() != -1){
+            std::stringstream l;
+            l << (servSock[n].second.getClientMaxBodySize() * 1000);
+            rsp + ("Content-Length: " + l.str() + "\r\n\r\n");
+            fileContent.substr(0, servSock[n].second.getClientMaxBodySize());
+        }else
+            rsp + ("Content-Length: " + tmp.str() + "\r\n\r\n");
         rsp + fileContent;
     }
 }

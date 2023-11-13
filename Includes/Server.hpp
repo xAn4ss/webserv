@@ -24,6 +24,7 @@ private:
     std::vector<std::string>    _server_name;
     std::map<std::string, int>  _methods;
     std::string                 _uploadsPath;
+    int                         _maxBodySize;
     // std::map<std::string, std::string> root_index;
 
 
@@ -39,6 +40,7 @@ public:
     int setIndex(std::string *s, int& size);
     int setAutoIndex(std::string *s, int& size);
     int setUploadsPath(std::string *, int&);
+    int setClientMaxBodySize(std::string *s, int&);
     void addLocation(ServLocation loc);
     void printPorts();
     std::vector<ServLocation>* getLocations();
@@ -48,6 +50,7 @@ public:
     int checkServ();
     std::vector<int> getPorts();
     std::string getIndex();
+    int getClientMaxBodySize();
     std::string getUploadPath();
     std::string getRoot();
     std::string getErrorPath();

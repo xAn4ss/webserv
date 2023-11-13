@@ -187,6 +187,10 @@ int Config::parse_server(std::vector<std::string>::iterator &b, std::vector<std:
             if (serv.setUploadsPath(splitIt(*i, s), s))
                 return 1;
             i++;
+        }else if(!strncmp("client_max_body_size", (*i).c_str(), 20)){
+            if (serv.setClientMaxBodySize(splitIt(*i, s), s))
+                return 1;
+            i++;
         }
         else if (!strncmp((*i).c_str(), "location", 8) &&
          (!strncmp((*(i + 1)).c_str(), "{", 1) || ((*(*i).rbegin()) == '{')))

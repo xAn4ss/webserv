@@ -15,7 +15,32 @@ std::string Server::getErrorPath(){
     return _error_path + "/";
 }
 
-
+int Server::setClientMaxBodySize(std::string *s, int& size){
+    if (size != 2){
+        std::cout << "Error in Client_Max_Body directive." << std::endl;
+        return 1;
+    }
+    if (s[1][(int)s[1].size()-1] != 'M'){
+            std::cout << s[1][(int)s[1].size()-1] <<"Error in client max body size directive.." << std::endl;
+            return 1;
+    }
+    std::string tmp = s[1].substr(0, s[1].size()-1);
+    std::cout << "==== " << tmp << " =====" << std::endl;
+    for (size_t i = 0; i < s[1].size()-1;s++){
+        if (tmp.find_first_not_of("0123456789") != std::string::npos)
+        {
+            std::cout << "Error in client max body size directive..." << std::endl;
+            return 1;
+        }
+    }
+ 
+    std::stringstream sss;
+    sss << tmp;
+    int x = 0;
+    sss >> x;
+    _maxBodySize = x;
+    return 0;
+}
 std::string Server::getIndex(){
     return _index;
 }
@@ -72,6 +97,10 @@ int Server::checkServ(){
     return 0;
 }
 
+int Server::getClientMaxBodySize(){
+    return _maxBodySize;
+}
+
 std::vector<ServLocation>* Server::getLocations(){
 
     if (_location.empty())
@@ -87,6 +116,7 @@ Server::Server(/* args */)
     _isAutoIndex = false;
     _index = "";
     _uploadsPath = "/tmp/uploads/";
+    _maxBodySize = -1;
 }
 
 void Server::addLocation(ServLocation loc){
@@ -251,6 +281,8 @@ int Server::setUploadsPath(std::string *s, int& size){
     }
     if (!opendir(s[1].c_str()))
     {
+
+        std::cout << s[1];
         std::cout << "error in uploads path." << std::endl;
         return 1;
     }

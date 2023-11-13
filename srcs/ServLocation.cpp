@@ -232,8 +232,6 @@ int ServLocation::setLocationPath(std::string s)
 
 bool ServLocation::getLocationIsCgi()
 {
-    std::cout << "////////////////// " << _isCgi << "  //////////////" << std::endl;
-
     return _isCgi;
 }
 
